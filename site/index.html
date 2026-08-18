@@ -214,6 +214,20 @@
 
   let ALL = [];
 
+  // --- Output escaping -------------------------------------------------
+  // Every value below comes from the database and is rendered via innerHTML,
+  // so it must be escaped. safeUrl() additionally rejects anything that is
+  // not http(s), which blocks javascript: and data: URLs in href/src.
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function safeUrl(u){
+    var s = String(u == null ? '' : u).trim();
+    return /^https?:\/\//i.test(s) ? esc(s) : '';
+  }
+
   function initials(name){
     return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
   }
@@ -230,27 +244,28 @@
     return true;
   }
   function avatarHtml(r){
-    return r.logo_url ? `<img src="${r.logo_url}" alt="">` : initials(r.name);
+    const logo = safeUrl(r.logo_url);
+    return logo ? `<img src="${logo}" alt="">` : esc(initials(r.name));
   }
 
   function cardHtml(r){
-    const tags = (r.services||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('');
+    const tags = (r.services||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
     const more = (r.services||[]).length>3 ? `<span class="tag">+${r.services.length-3} more</span>` : '';
     const flag = r.featured_national ? '<div class="top-flag">★ #1 NATIONALLY</div>' : (r.featured_province ? '<div class="top-flag">★ TOP IN PROVINCE</div>' : '');
-    return `<div class="card ${r.featured_national?'top-national':''}" onclick="openModal('${r.id}')">
+    return `<div class="card ${r.featured_national?'top-national':''}" onclick="openModal('${esc(r.id)}')">
       ${flag}
       <div class="card-top">
         <div class="avatar">${avatarHtml(r)}</div>
         <div class="card-title">
-          <div class="card-title-row"><h3>${r.name}</h3>${r.verified?'<span class="verified">✓ Verified</span>':''}</div>
-          <div class="loc">${[r.city,r.province].filter(Boolean).join(' · ')}</div>
+          <div class="card-title-row"><h3>${esc(r.name)}</h3>${r.verified?'<span class="verified">✓ Verified</span>':''}</div>
+          <div class="loc">${esc([r.city,r.province].filter(Boolean).join(' · '))}</div>
         </div>
       </div>
-      <div class="desc">${r.blurb || 'Certified solar PV installer.'}</div>
+      <div class="desc">${esc(r.blurb || 'Certified solar PV installer.')}</div>
       <div class="tags">${tags}${more}</div>
       <div class="card-stats">
-        <div class="stat">EXPERIENCE<b>${r.years_in_business ? r.years_in_business+' yrs' : '—'}</b></div>
-        <div class="stat">SYSTEM SIZE<b>${sizeLabel(r) || '—'}</b></div>
+        <div class="stat">EXPERIENCE<b>${esc(r.years_in_business ? r.years_in_business+' yrs' : '—')}</b></div>
+        <div class="stat">SYSTEM SIZE<b>${esc(sizeLabel(r) || '—')}</b></div>
         <div class="view-link">View Profile →</div>
       </div>
     </div>`;
@@ -298,20 +313,21 @@
     const r = ALL.find(x=>x.id===id);
     if(!r) return;
     const contactBtns = [];
-    if(r.website) contactBtns.push(`<a class="btn btn-primary" href="https://${r.website.replace(/^https?:\/\//,'')}" target="_blank" rel="noopener">Visit Website</a>`);
-    if(r.phone) contactBtns.push(`<a class="btn btn-ghost" href="tel:${r.phone}">Call</a>`);
-    if(r.email) contactBtns.push(`<a class="btn btn-ghost" href="mailto:${r.email}">Email</a>`);
+    const site = r.website ? safeUrl('https://' + String(r.website).replace(/^https?:\/\//,'')) : '';
+    if(site) contactBtns.push(`<a class="btn btn-primary" href="${site}" target="_blank" rel="noopener">Visit Website</a>`);
+    if(r.phone) contactBtns.push(`<a class="btn btn-ghost" href="tel:${encodeURIComponent(r.phone)}">Call</a>`);
+    if(r.email) contactBtns.push(`<a class="btn btn-ghost" href="mailto:${encodeURIComponent(r.email)}">Email</a>`);
     document.getElementById('modalBody').innerHTML = `
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div style="clear:both;height:4px;"></div>
       <div class="avatar" style="width:52px;height:52px;font-size:17px;margin-bottom:14px;">${avatarHtml(r)}</div>
-      <h2 style="font-size:20px;margin-bottom:4px;">${r.name} ${r.verified?'<span class="verified" style="font-size:12px;">✓ Verified</span>':''}</h2>
-      <div class="loc" style="margin-bottom:14px;">${[r.city,r.province].filter(Boolean).join(' · ')}</div>
-      <p style="font-size:13.5px;color:var(--text-dim);margin-bottom:16px;">${r.blurb || 'Certified solar PV installer, verified against public industry records.'}</p>
-      <div class="tags" style="margin-bottom:16px;">${(r.services||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <h2 style="font-size:20px;margin-bottom:4px;">${esc(r.name)} ${r.verified?'<span class="verified" style="font-size:12px;">✓ Verified</span>':''}</h2>
+      <div class="loc" style="margin-bottom:14px;">${esc([r.city,r.province].filter(Boolean).join(' · '))}</div>
+      <p style="font-size:13.5px;color:var(--text-dim);margin-bottom:16px;">${esc(r.blurb || 'Certified solar PV installer, verified against public industry records.')}</p>
+      <div class="tags" style="margin-bottom:16px;">${(r.services||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
       <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
-        ${r.years_in_business?`<div class="stat">EXPERIENCE<b>${r.years_in_business} yrs</b></div>`:''}
-        ${sizeLabel(r)?`<div class="stat">SYSTEM SIZE<b>${sizeLabel(r)}</b></div>`:''}
+        ${r.years_in_business?`<div class="stat">EXPERIENCE<b>${esc(r.years_in_business)} yrs</b></div>`:''}
+        ${sizeLabel(r)?`<div class="stat">SYSTEM SIZE<b>${esc(sizeLabel(r))}</b></div>`:''}
       </div>
       <div class="contact-row">${contactBtns.join('') || '<p style="font-size:12.5px;color:var(--text-faint);">No public contact details on file yet.</p>'}</div>
     `;
@@ -328,13 +344,14 @@
     const dots = document.getElementById('adsDots');
     carousel.innerHTML = ads.map((ad,i)=>{
       const inst = ad.installer_id ? installersById[ad.installer_id] : null;
-      const logo = inst && inst.logo_url ? `<img src="${inst.logo_url}" alt="">` : '⭐';
-      const link = ad.cta_url || (inst && inst.website ? 'https://'+inst.website.replace(/^https?:\/\//,'') : '#');
+      const instLogo = inst ? safeUrl(inst.logo_url) : '';
+      const logo = instLogo ? `<img src="${instLogo}" alt="">` : '⭐';
+      const link = safeUrl(ad.cta_url) || (inst && inst.website ? safeUrl('https://'+String(inst.website).replace(/^https?:\/\//,'')) : '') || '#';
       return `<a class="ad-slide ${i===0?'show':''}" href="${link}" target="_blank" rel="noopener" data-i="${i}">
         <div class="ad-logo">${logo}</div>
         <div class="ad-body">
-          <b>${ad.title}${ad.discount_text?`<span class="disc">${ad.discount_text}</span>`:''}</b>
-          <p>${ad.subtitle||''}</p>
+          <b>${esc(ad.title)}${ad.discount_text?`<span class="disc">${esc(ad.discount_text)}</span>`:''}</b>
+          <p>${esc(ad.subtitle||'')}</p>
         </div>
       </a>`;
     }).join('');
