@@ -315,8 +315,12 @@
     const contactBtns = [];
     const site = r.website ? safeUrl('https://' + String(r.website).replace(/^https?:\/\//,'')) : '';
     if(site) contactBtns.push(`<a class="btn btn-primary" href="${site}" target="_blank" rel="noopener">Visit Website</a>`);
-    if(r.phone) contactBtns.push(`<a class="btn btn-ghost" href="tel:${encodeURIComponent(r.phone)}">Call</a>`);
-    if(r.email) contactBtns.push(`<a class="btn btn-ghost" href="mailto:${encodeURIComponent(r.email)}">Email</a>`);
+    // tel: wants a dialable string — digits and a leading +, nothing else.
+    // encodeURIComponent would turn "+27 87 133 0033" into "%2B27%2087%20133%200033",
+    // which some dialers refuse.
+    const telHref = String(r.phone || '').replace(/[^\d+]/g, '');
+    if(telHref) contactBtns.push(`<a class="btn btn-ghost" href="tel:${esc(telHref)}">Call</a>`);
+    if(r.email) contactBtns.push(`<a class="btn btn-ghost" href="mailto:${esc(String(r.email).trim())}">Email</a>`);
     document.getElementById('modalBody').innerHTML = `
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div style="clear:both;height:4px;"></div>
