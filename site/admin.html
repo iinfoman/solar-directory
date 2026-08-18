@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolarDirectory Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0a0e1a; --card:#131a2b; --card-2:#161e33; --border:#232c42;
+    --orange:#f5a623; --orange-2:#f7931e; --green:#22c55e; --red:#ef4444;
+    --text:#f5f7fa; --text-dim:#9aa4bb; --text-faint:#6b7590;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,-apple-system,sans-serif;}
+  html,body{max-width:100vw;overflow-x:hidden;}
+  body{background:var(--bg);color:var(--text);padding:0 0 60px;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 18px;}
+  header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  header b{font-size:16px;font-weight:800;}
+  .head-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn{padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--card-2);color:var(--text);cursor:pointer;}
+  .btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-2));color:#1a1206;border:none;}
+  .btn-danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:var(--red);}
+  input,select,textarea{width:100%;background:var(--card-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13.5px;margin-top:5px;font-family:inherit;}
+  input[type=file]{padding:8px;}
+  label{font-size:11.5px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+  .field{margin-bottom:14px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:5px;}
+  .toggle-row span{font-size:13px;}
+  .switch{position:relative;width:38px;height:22px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#2a3450;border-radius:999px;cursor:pointer;transition:.15s;}
+  .slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+  input:checked + .slider{background:var(--green);}
+  input:checked + .slider:before{transform:translateX(16px);}
+
+  #login{max-width:340px;margin:80px auto;padding:26px;background:var(--card);border:1px solid var(--border);border-radius:16px;}
+  #login h2{margin-bottom:16px;font-size:18px;}
+  #login .btn-primary{width:100%;margin-top:14px;}
+  .err{color:var(--red);font-size:12.5px;margin-top:8px;}
+
+  #app{display:none;}
+  .tabs{display:flex;gap:8px;margin:20px 0 6px;}
+  .tab{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;background:var(--card-2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;}
+  .tab.active{background:var(--orange);color:#1a1206;border-color:var(--orange);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin:16px 0;flex-wrap:wrap;gap:10px;}
+  .table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:12px;}
+  table{width:100%;min-width:640px;border-collapse:collapse;background:var(--card);font-size:13px;}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--text-faint);font-size:11px;text-transform:uppercase;letter-spacing:0.4px;}
+  tr:last-child td{border-bottom:none;}
+  .pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block;}
+  .pill-yes{background:rgba(34,197,94,0.12);color:var(--green);}
+  .pill-no{background:rgba(154,164,187,0.12);color:var(--text-dim);}
+  .pill-gold{background:rgba(245,166,35,0.15);color:var(--orange);}
+  .actions{display:flex;gap:6px;}
+  .actions .btn{padding:6px 10px;font-size:12px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(5,7,14,0.8);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:22px;}
+  .modal h3{margin-bottom:16px;font-size:16px;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;flex:1;min-width:120px;}
+  .stat-card b{display:block;font-size:22px;font-weight:800;}
+  .stat-card span{font-size:11px;color:var(--text-faint);text-transform:uppercase;}
+  .hint{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2>☀️ SolarDirectory Admin</h2>
+  <div class="field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
+  <div class="field"><label>Password</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+  <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Sign In</button>
+  <div class="err" id="loginErr"></div>
+  <p style="margin-top:14px;font-size:12px;color:var(--text-faint);text-align:center;">
+    First time here? <a href="#" onclick="doSignup();return false;" style="color:var(--orange);font-weight:700;">Create your admin account</a>
+  </p>
+  <p style="margin-top:10px;font-size:12px;text-align:center;"><a href="index.html" style="color:var(--text-dim);">← Back to main site</a></p>
+</div>
+
+<div id="app">
+  <header>
+    <b>☀️ SolarDirectory Admin</b>
+    <div class="head-actions">
+      <a href="index.html" class="btn">← View Site</a>
+      <button class="btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="stat-row" id="stats"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="installers" onclick="switchTab('installers')">Installers</div>
+      <div class="tab" data-tab="ads" onclick="switchTab('ads')">Adverts</div>
+    </div>
+
+    <div class="panel active" id="panel-installers">
+      <div class="toolbar">
+        <input id="search" style="max-width:260px;" placeholder="Filter by name/province..." oninput="renderTable()">
+        <button class="btn btn-primary" onclick="openEdit(null)">+ Add Installer</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Name</th><th>Province</th><th>Yrs</th><th>Rank</th><th>Active</th><th>Verified</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-ads">
+      <div class="toggle-row" style="margin-bottom:16px;">
+        <span><b>Advertising section</b> — shown on the public homepage</span>
+        <label class="switch"><input type="checkbox" id="adsEnabledToggle" onchange="toggleAdsEnabled()"><span class="slider"></span></label>
+      </div>
+      <div class="toolbar">
+        <span class="hint">Ads rotate automatically on the public site every few seconds.</span>
+        <button class="btn btn-primary" onclick="openAdEdit(null)">+ Add Advert</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Title</th><th>Discount</th><th>Linked Installer</th><th>Active</th><th></th></tr></thead>
+          <tbody id="adsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Installer edit modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Add Installer</h3>
+    <input type="hidden" id="f_id">
+    <div class="field"><label>Name</label><input id="f_name"></div>
+    <div class="row2">
+      <div class="field"><label>City</label><input id="f_city"></div>
+      <div class="field"><label>Province</label>
+        <select id="f_province">
+          <option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option>
+          <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+          <option>North West</option><option>Free State</option><option>Northern Cape</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Description (blurb)</label><textarea id="f_blurb" rows="3"></textarea></div>
+    <div class="field"><label>Services (comma-separated)</label><input id="f_services" placeholder="Commercial Rooftop, Battery Storage"></div>
+    <div class="row2">
+      <div class="field"><label>Years in Business</label><input id="f_years" type="number"></div>
+      <div class="field"><label>Verified</label>
+        <select id="f_verified"><option value="true">Yes</option><option value="false">No</option></select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Min System Size (kW)</label><input id="f_minkw" type="number"></div>
+      <div class="field"><label>Max System Size (kW)</label><input id="f_maxkw" type="number"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Phone</label><input id="f_phone" placeholder="+27..."></div>
+      <div class="field"><label>Email</label><input id="f_email" type="email"></div>
+    </div>
+    <div class="field"><label>Website</label><input id="f_website" placeholder="example.co.za"></div>
+    <div class="field"><label>Logo (optional)</label><input id="f_logo_file" type="file" accept="image/*"><div class="hint" id="f_logo_hint"></div></div>
+
+    <div class="field" style="margin-top:18px;">
+      <label>Ranking &amp; Visibility</label>
+      <div class="toggle-row">
+        <span>Active (visible on public site)</span>
+        <label class="switch"><input type="checkbox" id="f_active"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>★ Feature at top of this installer's province</span>
+        <label class="switch"><input type="checkbox" id="f_feat_province"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>★ #1 Nationally (only one installer can hold this)</span>
+        <label class="switch"><input type="checkbox" id="f_feat_national"><span class="slider"></span></label>
+      </div>
+      <div class="field"><label>Manual boost (higher = ranks higher when not featured)</label><input id="f_boost" type="number" value="0"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveInstaller()">Save</button>
+      <button class="btn" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ad edit modal -->
+<div class="modal-overlay" id="adModalOverlay">
+  <div class="modal">
+    <h3 id="adModalTitle">Add Advert</h3>
+    <input type="hidden" id="a_id">
+    <div class="field"><label>Title</label><input id="a_title" placeholder="e.g. Bester Africa — Featured Installer"></div>
+    <div class="field"><label>Subtitle</label><input id="a_subtitle" placeholder="Short line shown under the title"></div>
+    <div class="row2">
+      <div class="field"><label>Discount / Promo tag (optional)</label><input id="a_discount" placeholder="e.g. 10% off in August"></div>
+      <div class="field"><label>Display order</label><input id="a_order" type="number" value="0"></div>
+    </div>
+    <div class="field"><label>Linked installer (optional)</label>
+      <select id="a_installer"><option value="">— None —</option></select>
+    </div>
+    <div class="field"><label>Custom link (optional — overrides installer website)</label><input id="a_cta" placeholder="https://..."></div>
+    <div class="field"><label>Ad image / logo (optional)</label><input id="a_image_file" type="file" accept="image/*"><div class="hint" id="a_image_hint"></div></div>
+    <div class="toggle-row">
+      <span>Active</span>
+      <label class="switch"><input type="checkbox" id="a_active" checked><span class="slider"></span></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveAd()">Save</button>
+      <button class="btn" onclick="closeAdEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://alogcohoopgzerrxheiw.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_TcktYEjqHMXgha4tYY8QVA_78xT1aM8";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let ROWS = [], ADS = [];
+
+  async function doLogin(){
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error){ document.getElementById('loginErr').textContent = error.message; return; }
+    showApp();
+  }
+
+  async function doSignup(){
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    if(!email || !password){ document.getElementById('loginErr').textContent = 'Enter an email and password above first, then tap "Create your admin account".'; return; }
+    if(password.length < 8){ document.getElementById('loginErr').textContent = 'Password must be at least 8 characters.'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if(error){ document.getElementById('loginErr').textContent = error.message; return; }
+    if(data.session){ showApp(); return; }
+    document.getElementById('loginErr').style.color = 'var(--green)';
+    document.getElementById('loginErr').textContent = 'Account created! Sign in above (confirmation may already be complete).';
+  }
+
+  async function doLogout(){ await sb.auth.signOut(); location.reload(); }
+
+  async function showApp(){
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await Promise.all([loadRows(), loadAds(), loadSettings()]);
+  }
+
+  async function checkSession(){
+    const { data } = await sb.auth.getSession();
+    if(data.session) showApp();
+  }
+
+  function switchTab(name){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+    document.getElementById('panel-installers').classList.toggle('active', name==='installers');
+    document.getElementById('panel-ads').classList.toggle('active', name==='ads');
+  }
+
+  // ---------- Installers ----------
+  async function loadRows(){
+    const { data, error } = await sb.from('installers').select('*').order('created_at', { ascending:false });
+    if(error){ alert('Load error: '+error.message); return; }
+    ROWS = data;
+    renderStats();
+    renderTable();
+    const sel = document.getElementById('a_installer');
+    sel.innerHTML = '<option value="">— None —</option>' + ROWS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  }
+
+  function renderStats(){
+    const total = ROWS.length;
+    const active = ROWS.filter(r=>r.is_active).length;
+    const provinces = new Set(ROWS.map(r=>r.province).filter(Boolean)).size;
+    const avgYears = total ? Math.round(ROWS.reduce((s,r)=>s+(r.years_in_business||0),0)/total) : 0;
+    document.getElementById('stats').innerHTML = [
+      ['Total Installers', total], ['Active on Site', active], ['Provinces', provinces], ['Avg. Years', avgYears]
+    ].map(([label,val])=>`<div class="stat-card"><b>${val}</b><span>${label}</span></div>`).join('');
+  }
+
+  function renderTable(){
+    const q = document.getElementById('search').value.toLowerCase();
+    const list = ROWS.filter(r => !q || (r.name+(r.province||'')).toLowerCase().includes(q));
+    document.getElementById('tbody').innerHTML = list.map(r => `
+      <tr>
+        <td>${r.name}</td>
+        <td>${r.province||'—'}</td>
+        <td>${r.years_in_business ?? '—'}</td>
+        <td>${r.featured_national?'<span class="pill pill-gold">#1 National</span>':(r.featured_province?'<span class="pill pill-gold">Top Province</span>':(r.sort_boost?('+'+r.sort_boost):'—'))}</td>
+        <td><span class="pill ${r.is_active?'pill-yes':'pill-no'}">${r.is_active?'Active':'Hidden'}</span></td>
+        <td><span class="pill ${r.verified?'pill-yes':'pill-no'}">${r.verified?'Verified':'Unverified'}</span></td>
+        <td class="actions">
+          <button class="btn" onclick="openEdit('${r.id}')">Edit</button>
+          <button class="btn btn-danger" onclick="deleteInstaller('${r.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:24px;">No installers found.</td></tr>';
+  }
+
+  function openEdit(id){
+    const r = id ? ROWS.find(x=>x.id===id) : null;
+    document.getElementById('modalTitle').textContent = r ? 'Edit Installer' : 'Add Installer';
+    document.getElementById('f_id').value = r ? r.id : '';
+    document.getElementById('f_name').value = r ? r.name : '';
+    document.getElementById('f_city').value = r ? (r.city||'') : '';
+    document.getElementById('f_province').value = r ? (r.province||'Gauteng') : 'Gauteng';
+    document.getElementById('f_blurb').value = r ? (r.blurb||'') : '';
+    document.getElementById('f_services').value = r ? (r.services||[]).join(', ') : '';
+    document.getElementById('f_years').value = r ? (r.years_in_business ?? '') : '';
+    document.getElementById('f_verified').value = r ? String(r.verified) : 'false';
+    document.getElementById('f_minkw').value = r ? (r.min_system_size_kw ?? '') : '';
+    document.getElementById('f_maxkw').value = r ? (r.max_system_size_kw ?? '') : '';
+    document.getElementById('f_phone').value = r ? (r.phone||'') : '';
+    document.getElementById('f_email').value = r ? (r.email||'') : '';
+    document.getElementById('f_website').value = r ? (r.website||'') : '';
+    document.getElementById('f_logo_file').value = '';
+    document.getElementById('f_logo_hint').textContent = r && r.logo_url ? 'Current logo is set — choose a file to replace it.' : '';
+    document.getElementById('f_active').checked = r ? !!r.is_active : true;
+    document.getElementById('f_feat_province').checked = r ? !!r.featured_province : false;
+    document.getElementById('f_feat_national').checked = r ? !!r.featured_national : false;
+    document.getElementById('f_boost').value = r ? (r.sort_boost ?? 0) : 0;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+  function closeEdit(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+  async function uploadFile(fileInput, prefix){
+    const file = fileInput.files[0];
+    if(!file) return null;
+    const path = `${prefix}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_')}`;
+    const { error } = await sb.storage.from('directory-assets').upload(path, file, { upsert:true });
+    if(error){ alert('Image upload failed: '+error.message); return null; }
+    const { data } = sb.storage.from('directory-assets').getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function saveInstaller(){
+    const id = document.getElementById('f_id').value;
+    const wantsNational = document.getElementById('f_feat_national').checked;
+    const logoUrl = await uploadFile(document.getElementById('f_logo_file'), 'logos');
+    const payload = {
+      name: document.getElementById('f_name').value.trim(),
+      city: document.getElementById('f_city').value.trim(),
+      province: document.getElementById('f_province').value,
+      blurb: document.getElementById('f_blurb').value.trim(),
+      services: document.getElementById('f_services').value.split(',').map(s=>s.trim()).filter(Boolean),
+      years_in_business: document.getElementById('f_years').value ? Number(document.getElementById('f_years').value) : null,
+      verified: document.getElementById('f_verified').value === 'true',
+      min_system_size_kw: document.getElementById('f_minkw').value ? Number(document.getElementById('f_minkw').value) : null,
+      max_system_size_kw: document.getElementById('f_maxkw').value ? Number(document.getElementById('f_maxkw').value) : null,
+      phone: document.getElementById('f_phone').value.trim(),
+      email: document.getElementById('f_email').value.trim(),
+      website: document.getElementById('f_website').value.trim(),
+      is_active: document.getElementById('f_active').checked,
+      featured_province: document.getElementById('f_feat_province').checked,
+      sort_boost: Number(document.getElementById('f_boost').value || 0)
+    };
+    if(logoUrl) payload.logo_url = logoUrl;
+    if(!payload.name){ alert('Name is required'); return; }
+
+    // If claiming the national spot, clear it from everyone else first (DB also enforces this with a unique index)
+    if(wantsNational){
+      await sb.from('installers').update({ featured_national:false }).eq('featured_national', true);
+    }
+    payload.featured_national = wantsNational;
+
+    let error;
+    if(id){ ({ error } = await sb.from('installers').update(payload).eq('id', id)); }
+    else { ({ error } = await sb.from('installers').insert(payload)); }
+    if(error){ alert('Save error: '+error.message); return; }
+    closeEdit();
+    await loadRows();
+  }
+
+  async function deleteInstaller(id){
+    if(!confirm('Delete this installer? This cannot be undone — consider using "Active" toggle to just hide it instead.')) return;
+    const { error } = await sb.from('installers').delete().eq('id', id);
+    if(error){ alert('Delete error: '+error.message); return; }
+    await loadRows();
+  }
+
+  // ---------- Ads ----------
+  async function loadAds(){
+    const { data, error } = await sb.from('ads').select('*').order('display_order');
+    if(error){ alert('Ad load error: '+error.message); return; }
+    ADS = data;
+    renderAdsTable();
+  }
+
+  function renderAdsTable(){
+    document.getElementById('adsTbody').innerHTML = ADS.map(ad => {
+      const inst = ROWS.find(r=>r.id===ad.installer_id);
+      return `<tr>
+        <td>${ad.title}</td>
+        <td>${ad.discount_text||'—'}</td>
+        <td>${inst?inst.name:'—'}</td>
+        <td><span class="pill ${ad.active?'pill-yes':'pill-no'}">${ad.active?'Active':'Off'}</span></td>
+        <td class="actions">
+          <button class="btn" onclick="openAdEdit('${ad.id}')">Edit</button>
+          <button class="btn btn-danger" onclick="deleteAd('${ad.id}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px;">No adverts yet.</td></tr>';
+  }
+
+  function openAdEdit(id){
+    const a = id ? ADS.find(x=>x.id===id) : null;
+    document.getElementById('adModalTitle').textContent = a ? 'Edit Advert' : 'Add Advert';
+    document.getElementById('a_id').value = a ? a.id : '';
+    document.getElementById('a_title').value = a ? a.title : '';
+    document.getElementById('a_subtitle').value = a ? (a.subtitle||'') : '';
+    document.getElementById('a_discount').value = a ? (a.discount_text||'') : '';
+    document.getElementById('a_order').value = a ? a.display_order : 0;
+    document.getElementById('a_installer').value = a ? (a.installer_id||'') : '';
+    document.getElementById('a_cta').value = a ? (a.cta_url||'') : '';
+    document.getElementById('a_image_file').value = '';
+    document.getElementById('a_image_hint').textContent = a && a.image_url ? 'Current image is set — choose a file to replace it.' : '';
+    document.getElementById('a_active').checked = a ? !!a.active : true;
+    document.getElementById('adModalOverlay').classList.add('open');
+  }
+  function closeAdEdit(){ document.getElementById('adModalOverlay').classList.remove('open'); }
+
+  async function saveAd(){
+    const id = document.getElementById('a_id').value;
+    const imageUrl = await uploadFile(document.getElementById('a_image_file'), 'ads');
+    const payload = {
+      title: document.getElementById('a_title').value.trim(),
+      subtitle: document.getElementById('a_subtitle').value.trim(),
+      discount_text: document.getElementById('a_discount').value.trim(),
+      display_order: Number(document.getElementById('a_order').value || 0),
+      installer_id: document.getElementById('a_installer').value || null,
+      cta_url: document.getElementById('a_cta').value.trim(),
+      active: document.getElementById('a_active').checked
+    };
+    if(imageUrl) payload.image_url = imageUrl;
+    if(!payload.title){ alert('Title is required'); return; }
+    let error;
+    if(id){ ({ error } = await sb.from('ads').update(payload).eq('id', id)); }
+    else { ({ error } = await sb.from('ads').insert(payload)); }
+    if(error){ alert('Save error: '+error.message); return; }
+    closeAdEdit();
+    await loadAds();
+  }
+
+  async function deleteAd(id){
+    if(!confirm('Delete this advert?')) return;
+    const { error } = await sb.from('ads').delete().eq('id', id);
+    if(error){ alert('Delete error: '+error.message); return; }
+    await loadAds();
+  }
+
+  // ---------- Settings ----------
+  async function loadSettings(){
+    const { data } = await sb.from('settings').select('*').eq('key','ads_enabled').maybeSingle();
+    document.getElementById('adsEnabledToggle').checked = !data || data.value === 'true';
+  }
+  async function toggleAdsEnabled(){
+    const on = document.getElementById('adsEnabledToggle').checked;
+    const { error } = await sb.from('settings').update({ value: String(on) }).eq('key','ads_enabled');
+    if(error) alert('Could not update: '+error.message);
+  }
+
+  checkSession();
+</script>
+</body>
+</html>
