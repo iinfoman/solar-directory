@@ -1,0 +1,8 @@
+# Netlify build settings for SolarDirectory.
+#
+# The deployable site is the static bundle in site/ — plain HTML with no build
+# step. The Vite/React app at the repo root is not what gets published; if that
+# ever changes, switch publish to "dist" and set command = "npm run build".
+
+[build]
+  publish = "site"
