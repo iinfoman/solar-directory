@@ -173,3 +173,52 @@ create policy "Owner delete directory-assets"
   on storage.objects for delete to authenticated
   using (bucket_id = 'directory-assets'
          and (auth.jwt() ->> 'email') = 'admin@example.com');
+
+-- ------------------------------------------------------------- ratings ----
+-- Visitor star ratings. The public may insert one rating per installer per
+-- browser key and read only the aggregate; individual rows are owner-only.
+
+create table if not exists reviews (
+  id           uuid primary key default gen_random_uuid(),
+  installer_id uuid not null references installers(id) on delete cascade,
+  rating       smallint not null check (rating between 1 and 5),
+  -- Random id the browser stores in localStorage. Stops accidental and casual
+  -- repeat voting. It is NOT authentication: anyone can clear it.
+  voter_key    text not null,
+  created_at   timestamptz not null default now(),
+  unique (installer_id, voter_key)
+);
+
+create index if not exists reviews_installer_id_idx on reviews (installer_id);
+
+alter table reviews enable row level security;
+
+-- Insert only. There is deliberately no anon UPDATE policy: an anonymous
+-- caller cannot prove it owns a row, so any update policy broad enough to
+-- let someone edit their own rating would also let them rewrite everyone
+-- else's. One vote per key, enforced by the unique constraint.
+create policy "Public insert rating"
+  on reviews for insert to anon
+  with check (rating between 1 and 5 and length(voter_key) between 8 and 64);
+
+create policy "Owner read reviews"
+  on reviews for select to authenticated
+  using (true);
+
+create policy "Owner manage reviews"
+  on reviews for all to authenticated
+  using ((auth.jwt() ->> 'email') = 'admin@example.com')
+  with check ((auth.jwt() ->> 'email') = 'admin@example.com');
+
+-- Aggregate only. security_invoker = off so the view runs as its owner and
+-- can read the underlying rows; the public gets averages, never raw ratings,
+-- and one request returns a few numbers instead of every rating ever left.
+create or replace view installer_ratings
+with (security_invoker = off) as
+  select installer_id,
+         round(avg(rating)::numeric, 1) as rating_avg,
+         count(*)                       as rating_count
+  from reviews
+  group by installer_id;
+
+grant select on installer_ratings to anon, authenticated;
