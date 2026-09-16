@@ -69,6 +69,10 @@
 
   /* ---------- hero ---------- */
   .hero{padding:52px 0 34px;border-bottom:1px solid var(--rule-soft);}
+  .hero-grid{display:grid;gap:26px;align-items:center;}
+  @media(min-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,44%);gap:44px;}}
+  .hero-shot{display:block;min-width:0;}
+  .hero-shot img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--rule);}
   h1{font-size:clamp(30px,5.4vw,50px);font-weight:800;line-height:1.06;max-width:15ch;}
   h1 em{font-style:normal;color:var(--copper);}
   .hero p{color:var(--ink-soft);font-size:16px;max-width:52ch;margin-top:16px;}
@@ -190,14 +194,25 @@
 
 <main>
   <section class="hero">
-    <div class="wrap">
-      <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
-      <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
-      <div class="hero-meta">
-        <span><b id="statCount">—</b> installers listed</span>
-        <span><b id="statVerified">—</b> verified</span>
-        <span><b id="statProvinces">—</b> provinces covered</span>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
+        <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
+        <div class="hero-meta">
+          <span><b id="statCount">—</b> installers listed</span>
+          <span><b id="statVerified">—</b> verified</span>
+          <span><b id="statProvinces">—</b> provinces covered</span>
+        </div>
       </div>
+      <picture class="hero-shot">
+        <source type="image/avif" sizes="(min-width:900px) 44vw, 100vw"
+                srcset="assets/hero-800.avif 800w, assets/hero-1200.avif 1200w">
+        <source type="image/webp" sizes="(min-width:900px) 44vw, 100vw"
+                srcset="assets/hero-800.webp 800w, assets/hero-1200.webp 1200w">
+        <!-- Hero image: never loading="lazy", it is the LCP element. -->
+        <img src="assets/hero-800.webp" width="1200" height="800" decoding="async" fetchpriority="high"
+             alt="Rooftop solar array above Cape Town, with Table Mountain silhouetted at sunset">
+      </picture>
     </div>
   </section>
 
