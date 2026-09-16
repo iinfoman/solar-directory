@@ -111,15 +111,15 @@
   .tag{font-size:11.5px;color:var(--ink-soft);border:1px solid var(--rule);padding:3px 8px;border-radius:4px;}
 
   /* signature element: capacity scale */
-  .cap{margin-top:12px;}
-  @media(min-width:860px){.cap{margin-top:0;}}
+  .cap{margin-top:12px;grid-column:2/-1;}
+  @media(min-width:860px){.cap{margin-top:0;grid-column:auto;}}
   .cap-label{font-size:11px;color:var(--ink-faint);letter-spacing:.05em;text-transform:uppercase;font-weight:600;margin-bottom:5px;}
   .cap-track{position:relative;height:7px;background:var(--paper-sunk);border:1px solid var(--rule);border-radius:4px;overflow:hidden;}
   .cap-fill{position:absolute;top:0;bottom:0;background:var(--copper);border-radius:3px;min-width:3px;}
   .cap-val{font-size:12.5px;color:var(--ink);font-weight:600;margin-top:5px;}
 
-  .row-side{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
-  @media(min-width:860px){.row-side{margin-top:0;align-items:flex-end;}}
+  .row-side{display:flex;flex-direction:column;gap:8px;margin-top:12px;grid-column:2/-1;}
+  @media(min-width:860px){.row-side{margin-top:0;align-items:flex-end;grid-column:auto;}}
 
   /* ---------- stars ---------- */
   .stars{display:inline-flex;align-items:center;gap:6px;}
