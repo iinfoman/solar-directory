@@ -3,221 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SolarDirectory South Africa — Find Vetted Commercial Solar Installers</title>
-<meta name="description" content="South Africa's commercial solar directory. Find vetted, certified solar PV installers for your business — compare experience, scale, and services.">
+<title>SolarDirectory South Africa — Vetted Commercial Solar Installers</title>
+<meta name="description" content="Compare vetted commercial and industrial solar PV installers across South Africa by province, system size and services. Independent directory of certified installers.">
+<link rel="canonical" href="https://solardirectorysa.co.za/">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SolarDirectory South Africa">
+<meta property="og:title" content="SolarDirectory South Africa — Vetted Commercial Solar Installers">
+<meta property="og:description" content="Compare vetted commercial and industrial solar PV installers across South Africa by province, system size and services.">
+<meta property="og:url" content="https://solardirectorysa.co.za/">
+<meta property="og:locale" content="en_ZA">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23B4531F'/><path d='M17.5 5 9 18h5.5L13.5 27 22 14h-5.5z' fill='%23fff'/></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SolarDirectory South Africa",
+  "url": "https://solardirectorysa.co.za/",
+  "description": "Independent directory of vetted commercial and industrial solar PV installers in South Africa.",
+  "inLanguage": "en-ZA",
+  "about": {
+    "@type": "Thing",
+    "name": "Commercial solar PV installation in South Africa"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
   :root{
-    --bg:#0a0e1a; --card:#131a2b; --card-2:#161e33;
-    --border:#232c42; --border-soft:#1c2438;
-    --orange:#f5a623; --orange-2:#f7931e;
-    --green:#22c55e; --text:#f5f7fa; --text-dim:#9aa4bb; --text-faint:#6b7590;
+    --paper:#FFFFFF; --paper-sunk:#F2F4F3;
+    --ink:#16211F; --ink-soft:#5A6866; --ink-faint:#8B9895;
+    --rule:#DDE3E1; --rule-soft:#EBEFEE;
+    --copper:#B4531F; --copper-dark:#8E3F14; --copper-wash:#FBF1EC;
+    --volt:#1D7A4C; --volt-wash:#EEF7F2;
+    --focus:#16211F;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{max-width:100vw;overflow-x:hidden;}
-  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  html{-webkit-text-size-adjust:100%;}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  h1,h2,h3,.display{font-family:'Archivo','Inter',system-ui,sans-serif;letter-spacing:-0.02em;}
   a{color:inherit;text-decoration:none;}
   img{max-width:100%;display:block;}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
+  button{font:inherit;color:inherit;}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:3px;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px;}
 
-  header{position:sticky;top:0;z-index:50;background:rgba(10,14,26,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border-soft);}
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;max-width:1200px;margin:0 auto;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--orange),var(--orange-2));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-  .brand-text{line-height:1.1;}
-  .brand-text b{display:block;font-size:16px;font-weight:800;letter-spacing:-0.2px;}
-  .brand-text small{display:block;font-size:9.5px;letter-spacing:2px;color:var(--text-faint);font-weight:600;}
-  .nav-links{display:none;align-items:center;gap:22px;font-size:14px;color:var(--text-dim);font-weight:500;}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:9px;font-size:13.5px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;}
-  .btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-2));color:#1a1206;}
-  .btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border);}
-  @media(min-width:820px){.nav-links{display:flex;}}
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:1px solid var(--rule);}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 20px;max-width:1120px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--copper);display:grid;place-items:center;flex-shrink:0;}
+  .brand-mark svg{width:17px;height:17px;fill:#fff;}
+  .brand b{font-family:'Archivo',sans-serif;font-size:15.5px;font-weight:800;display:block;line-height:1.15;}
+  .brand span{font-size:11px;color:var(--ink-faint);display:block;line-height:1.2;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
+  .btn-primary{background:var(--copper);color:#fff;}
+  .btn-primary:hover{background:var(--copper-dark);}
+  .btn-outline{background:var(--paper);color:var(--ink);border-color:var(--rule);}
+  .btn-outline:hover{border-color:var(--ink-faint);}
+  .btn-sm{padding:7px 13px;font-size:12.5px;}
 
-  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border-soft);}
-  .hero-bg{position:absolute;inset:0;background:url('assets/hero.jpg') center/cover;opacity:0.28;}
-  .hero-fade{position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 30%, rgba(10,14,26,0.55) 70%, rgba(10,14,26,0.2));}
-  .hero-inner{position:relative;padding:52px 20px 40px;max-width:1200px;margin:0 auto;}
-  .badge{display:inline-flex;align-items:center;gap:7px;background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.35);color:var(--orange);font-size:11.5px;font-weight:700;letter-spacing:0.6px;padding:7px 14px;border-radius:999px;margin-bottom:20px;}
-  h1{font-size:32px;font-weight:800;letter-spacing:-0.8px;line-height:1.15;max-width:560px;margin-bottom:14px;}
-  h1 span{color:var(--orange);}
-  .hero-sub{color:var(--text-dim);font-size:15px;max-width:480px;margin-bottom:26px;}
-  @media(min-width:640px){h1{font-size:44px;}}
+  /* ---------- hero ---------- */
+  .hero{padding:52px 0 34px;border-bottom:1px solid var(--rule-soft);}
+  .hero-grid{display:grid;gap:26px;align-items:center;}
+  @media(min-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,44%);gap:44px;}}
+  .hero-shot{display:block;min-width:0;}
+  .hero-shot img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--rule);}
+  h1{font-size:clamp(30px,5.4vw,50px);font-weight:800;line-height:1.06;max-width:15ch;}
+  h1 em{font-style:normal;color:var(--copper);}
+  .hero p{color:var(--ink-soft);font-size:16px;max-width:52ch;margin-top:16px;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font-size:13px;color:var(--ink-soft);}
+  .hero-meta b{font-weight:600;color:var(--ink);}
 
-  .search-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:grid;gap:10px;grid-template-columns:1fr;box-shadow:0 20px 50px -20px rgba(0,0,0,0.5);}
-  @media(min-width:900px){.search-panel{grid-template-columns:1.6fr 1fr 1fr 1fr auto;align-items:center;}}
+  /* ---------- filters ---------- */
+  .filters{position:sticky;top:59px;z-index:50;background:var(--paper-sunk);border-bottom:1px solid var(--rule);padding:12px 0;}
+  .filter-grid{display:grid;gap:8px;grid-template-columns:1fr;max-width:1120px;margin:0 auto;padding:0 20px;}
+  @media(min-width:760px){.filter-grid{grid-template-columns:2fr 1fr 1fr 1fr;}}
   .field{position:relative;min-width:0;}
-  .field select, .field input{width:100%;background:var(--card-2);border:1px solid var(--border);color:var(--text);font-size:14px;padding:12px 14px 12px 38px;border-radius:10px;font-family:inherit;appearance:none;}
-  .field input::placeholder{color:var(--text-faint);}
-  .field-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:0.6;font-size:14px;pointer-events:none;}
-  .search-panel .btn-primary{padding:12px 20px;justify-content:center;}
+  .field input,.field select{width:100%;background:var(--paper);border:1px solid var(--rule);color:var(--ink);font-family:inherit;font-size:14px;padding:11px 13px;border-radius:8px;appearance:none;}
+  .field select{padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5 6 8.5 10 4.5' stroke='%235A6866' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;background-size:12px;}
+  .field input::placeholder{color:var(--ink-faint);}
 
-  .features{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:34px;}
-  @media(min-width:820px){.features{grid-template-columns:repeat(4,1fr);}}
-  .feature{display:flex;gap:10px;align-items:flex-start;}
-  .feature .ic{width:34px;height:34px;border-radius:9px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-  .feature b{display:block;font-size:13.5px;font-weight:700;}
-  .feature p{font-size:12px;color:var(--text-faint);margin-top:2px;}
+  /* ---------- results ---------- */
+  .results-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:26px 0 12px;}
+  .results-head h2{font-size:17px;font-weight:700;}
+  .results-head span{font-size:13px;color:var(--ink-soft);}
 
-  /* Ads carousel */
-  .ads-section{padding:26px 0 4px;}
-  .ads-label{font-size:11px;color:var(--text-faint);font-weight:700;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:10px;}
-  .ads-carousel{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(245,166,35,0.3);background:linear-gradient(120deg,#1c1508,#131a2b 60%);min-height:118px;}
-  .ad-slide{display:none;padding:20px;gap:14px;align-items:center;}
-  .ad-slide.show{display:flex;}
-  .ad-logo{width:52px;height:52px;border-radius:10px;background:var(--card-2);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--orange);overflow:hidden;}
-  .ad-logo img{width:100%;height:100%;object-fit:cover;}
-  .ad-body{flex:1;min-width:0;}
-  .ad-body b{font-size:14.5px;font-weight:700;}
-  .ad-body .disc{display:inline-block;margin-left:8px;font-size:10.5px;background:rgba(34,197,94,0.15);color:var(--green);padding:2px 8px;border-radius:999px;font-weight:700;}
-  .ad-body p{font-size:12.5px;color:var(--text-dim);margin-top:3px;}
-  .ads-dots{display:flex;gap:5px;justify-content:center;padding:10px 0 14px;}
-  .ads-dots span{width:6px;height:6px;border-radius:50%;background:var(--border);}
-  .ads-dots span.on{background:var(--orange);}
+  .rows{display:flex;flex-direction:column;border-top:1px solid var(--rule);}
+  .row{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:20px 4px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .12s;align-items:start;}
+  .row:hover{background:var(--paper-sunk);}
+  .row.is-top{background:var(--copper-wash);}
+  .row.is-top:hover{background:#F8E9E1;}
+  @media(min-width:860px){
+    .row{grid-template-columns:48px minmax(0,1fr) 190px 150px;gap:18px;align-items:center;}
+  }
+  .avatar{width:44px;height:44px;border-radius:9px;background:var(--paper-sunk);border:1px solid var(--rule);display:grid;place-items:center;font-family:'Archivo',sans-serif;font-size:14px;font-weight:700;color:var(--ink-soft);overflow:hidden;flex-shrink:0;}
+  @media(min-width:860px){.avatar{width:48px;height:48px;}}
+  .avatar img{width:100%;height:100%;object-fit:contain;}
 
-  main{padding:36px 0 80px;}
-  .listing-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
-  .listing-head h2{font-size:19px;font-weight:700;}
-  .result-count{font-size:12.5px;color:var(--green);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);padding:5px 12px;border-radius:999px;font-weight:600;}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px;}
-  @media(min-width:700px){.grid{grid-template-columns:1fr 1fr;}}
-  @media(min-width:1080px){.grid{grid-template-columns:1fr 1fr 1fr;}}
+  .row-main{min-width:0;}
+  .row-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .row-title h3{font-size:16px;font-weight:700;}
+  .flag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--copper);background:var(--copper-wash);border:1px solid #F0D8CB;padding:2px 7px;border-radius:4px;}
+  .verified{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--volt);background:var(--volt-wash);padding:2px 7px;border-radius:4px;}
+  .loc{font-size:13px;color:var(--ink-soft);margin-top:3px;}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+  .tag{font-size:11.5px;color:var(--ink-soft);border:1px solid var(--rule);padding:3px 8px;border-radius:4px;}
 
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s;cursor:pointer;position:relative;}
-  .card:hover{border-color:#3a4568;}
-  .card.top-national{border-color:var(--orange);box-shadow:0 0 0 1px rgba(245,166,35,0.4);}
-  .top-flag{position:absolute;top:-9px;left:14px;background:linear-gradient(135deg,var(--orange),var(--orange-2));color:#1a1206;font-size:10px;font-weight:800;padding:3px 10px;border-radius:999px;letter-spacing:0.3px;}
-  .card-top{display:flex;align-items:flex-start;gap:12px;}
-  .avatar{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#2a3450,#1c2438);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--text-dim);flex-shrink:0;border:1px solid var(--border);overflow:hidden;}
-  .avatar img{width:100%;height:100%;object-fit:cover;}
-  .card-title{flex:1;min-width:0;}
-  .card-title-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-  .card-title-row h3{font-size:15px;font-weight:700;}
-  .verified{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--green);font-weight:700;}
-  .loc{font-size:12px;color:var(--text-faint);margin-top:2px;}
-  .desc{font-size:12.5px;color:var(--text-dim);flex:1;}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;}
-  .tag{font-size:10.5px;background:var(--card-2);border:1px solid var(--border);color:var(--text-dim);padding:4px 9px;border-radius:999px;font-weight:500;}
-  .card-stats{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--border-soft);padding-top:12px;margin-top:2px;}
-  .stat{font-size:10px;color:var(--text-faint);font-weight:600;letter-spacing:0.4px;text-transform:uppercase;}
-  .stat b{display:block;color:var(--text);font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;margin-top:2px;}
-  .view-link{font-size:12.5px;font-weight:700;color:var(--orange);white-space:nowrap;}
+  /* signature element: capacity scale */
+  .cap{margin-top:12px;grid-column:2/-1;}
+  @media(min-width:860px){.cap{margin-top:0;grid-column:auto;}}
+  .cap-label{font-size:11px;color:var(--ink-faint);letter-spacing:.05em;text-transform:uppercase;font-weight:600;margin-bottom:5px;}
+  .cap-track{position:relative;height:7px;background:var(--paper-sunk);border:1px solid var(--rule);border-radius:4px;overflow:hidden;}
+  .cap-fill{position:absolute;top:0;bottom:0;background:var(--copper);border-radius:3px;min-width:3px;}
+  .cap-val{font-size:12.5px;color:var(--ink);font-weight:600;margin-top:5px;}
 
-  .empty, .loading{text-align:center;padding:60px 20px;color:var(--text-faint);font-size:14px;}
-  footer{border-top:1px solid var(--border-soft);padding:26px 20px;text-align:center;color:var(--text-faint);font-size:12px;}
-  footer a{color:var(--text-dim);}
+  .row-side{display:flex;flex-direction:column;gap:8px;margin-top:12px;grid-column:2/-1;}
+  @media(min-width:860px){.row-side{margin-top:0;align-items:flex-end;grid-column:auto;}}
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(5,7,14,0.75);backdrop-filter:blur(3px);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+  /* ---------- stars ---------- */
+  .stars{display:inline-flex;align-items:center;gap:6px;}
+  .star-track{position:relative;display:inline-block;font-size:13px;letter-spacing:1.5px;color:var(--rule);line-height:1;}
+  .star-fill{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap;color:var(--copper);}
+  .star-num{font-size:12.5px;color:var(--ink-soft);}
+  .star-none{font-size:12px;color:var(--ink-faint);}
+
+  /* ---------- ads ---------- */
+  .ads{border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);background:var(--paper-sunk);padding:16px 0;margin-top:8px;display:none;}
+  .ad-head{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:9px;}
+  .ad-carousel{position:relative;min-height:76px;}
+  .ad-slide{display:none;grid-template-columns:46px 1fr;gap:13px;align-items:center;background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:13px;}
+  .ad-slide.show{display:grid;}
+  .ad-logo{width:46px;height:46px;border-radius:8px;background:var(--paper-sunk);display:grid;place-items:center;overflow:hidden;}
+  .ad-body b{font-family:'Archivo',sans-serif;font-size:14.5px;font-weight:700;display:block;}
+  .ad-body p{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .disc{display:inline-block;margin-left:7px;font-size:11px;font-weight:700;color:#fff;background:var(--volt);padding:2px 7px;border-radius:4px;vertical-align:middle;}
+  .ad-dots{display:flex;gap:5px;margin-top:9px;}
+  .ad-dots span{width:5px;height:5px;border-radius:50%;background:var(--rule);}
+  .ad-dots span.on{background:var(--copper);}
+
+  .empty{padding:44px 4px;color:var(--ink-soft);font-size:14.5px;}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(22,33,31,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
   .modal-overlay.open{display:flex;}
-  @media(min-width:640px){.modal-overlay{align-items:center;}}
-  .modal{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 0 0;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 22px 30px;}
-  @media(min-width:640px){.modal{border-radius:18px;}}
-  .modal-close{float:right;background:var(--card-2);border:1px solid var(--border);width:30px;height:30px;border-radius:8px;color:var(--text-dim);cursor:pointer;font-size:16px;}
-  .contact-row{display:flex;gap:10px;flex-wrap:wrap;}
-  .contact-row .btn{flex:1;justify-content:center;}
+  .modal{background:var(--paper);border-radius:14px;max-width:530px;width:100%;max-height:90vh;overflow-y:auto;padding:26px;position:relative;}
+  .modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:7px;border:1px solid var(--rule);background:var(--paper);cursor:pointer;font-size:15px;line-height:1;color:var(--ink-soft);}
+  .modal h2{font-size:21px;font-weight:800;padding-right:34px;}
+  .modal .loc{font-size:13.5px;margin-top:4px;}
+  .modal-blurb{font-size:14px;color:var(--ink-soft);margin:15px 0;}
+  .spec{display:flex;gap:26px;flex-wrap:wrap;padding:15px 0;border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);margin-bottom:17px;}
+  .spec div{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  .spec b{display:block;font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em;text-transform:none;margin-top:3px;}
+  .cta-row{display:flex;flex-direction:column;gap:8px;}
+  .cta-row .btn{width:100%;padding:12px 16px;font-size:14.5px;}
+  .alt-contact{font-size:13px;color:var(--ink-soft);margin-top:11px;}
+  .alt-contact a{color:var(--copper);font-weight:600;border-bottom:1px solid #E7CBBB;}
+
+  /* ---------- rating widget ---------- */
+  .rate{margin-top:20px;padding:15px;background:var(--paper-sunk);border:1px solid var(--rule);border-radius:10px;}
+  .rate b{font-family:'Archivo',sans-serif;font-size:14px;font-weight:700;display:block;}
+  .rate p{font-size:12.5px;color:var(--ink-soft);margin-top:3px;}
+  .rate-stars{display:flex;gap:4px;margin-top:11px;}
+  .rate-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--rule);background:var(--paper);cursor:pointer;font-size:17px;line-height:1;color:var(--rule);transition:color .12s,border-color .12s;}
+  .rate-btn:hover,.rate-btn.lit{color:var(--copper);border-color:#E7CBBB;}
+  .rate-msg{font-size:12.5px;margin-top:9px;font-weight:600;}
+
+  footer{border-top:1px solid var(--rule);padding:26px 0 40px;margin-top:36px;font-size:12.5px;color:var(--ink-faint);}
+  footer a{border-bottom:1px solid var(--rule);}
 </style>
 </head>
 <body>
 
 <header>
   <div class="nav">
-    <div class="brand">
-      <div class="brand-mark">☀️</div>
-      <div class="brand-text"><b>SolarDirectory</b><small>SOUTH AFRICA</small></div>
-    </div>
-    <div class="nav-links">
-      <a href="#listings">Browse Installers</a>
-    </div>
-    <a href="mailto:hello@solardirectory.co.za?subject=List%20my%20business" class="btn btn-primary">List Your Business</a>
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M17.5 5 9 18h5.5L13.5 27 22 14h-5.5z"/></svg></span>
+      <span>
+        <b>SolarDirectory</b>
+        <span>South Africa</span>
+      </span>
+    </a>
+    <a class="btn btn-primary btn-sm" href="mailto:hello@solardirectorysa.co.za?subject=List%20my%20business">List your business</a>
   </div>
 </header>
 
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-fade"></div>
-  <div class="hero-inner">
-    <div class="badge">🛡️ SOUTH AFRICA'S COMMERCIAL SOLAR DIRECTORY</div>
-    <h1>Find <span>vetted solar</span> installers for your business</h1>
-    <p class="hero-sub">Every installer in this directory is cross-checked against official industry certification records (SAPVIA membership &amp; PV GreenCard accreditation). Compare region, scale and services — then make contact directly.</p>
-
-    <div class="search-panel">
-      <div class="field"><span class="field-icon">🔍</span><input id="q" type="text" placeholder="Search installers or city..."></div>
-      <div class="field"><span class="field-icon">📍</span>
-        <select id="province">
-          <option value="">All Provinces</option>
-          <option>Gauteng</option>
-          <option>Western Cape</option>
-          <option>KwaZulu-Natal</option>
-          <option>Eastern Cape</option>
-          <option>Limpopo</option>
-          <option>Mpumalanga</option>
-          <option>North West</option>
-          <option>Free State</option>
-          <option>Northern Cape</option>
-        </select>
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
+        <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
+        <div class="hero-meta">
+          <span><b id="statCount">—</b> installers listed</span>
+          <span><b id="statVerified">—</b> verified</span>
+          <span><b id="statProvinces">—</b> provinces covered</span>
+        </div>
       </div>
-      <div class="field"><span class="field-icon">⚡</span>
-        <select id="sizeband">
-          <option value="">All System Sizes</option>
-          <option value="small">Small (under 50kW)</option>
-          <option value="medium">Medium (50-500kW)</option>
-          <option value="large">Large (500kW+)</option>
-        </select>
-      </div>
-      <div class="field"><span class="field-icon">🏷️</span>
-        <select id="sort">
-          <option value="rank">Sort: Featured First</option>
-          <option value="name">Sort: Name (A-Z)</option>
-          <option value="years">Sort: Most Experienced</option>
-          <option value="province">Sort: Province</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="applyFilters()">Search Installers →</button>
+      <picture class="hero-shot">
+        <source type="image/avif" sizes="(min-width:900px) 44vw, 100vw"
+                srcset="assets/hero-800.avif 800w, assets/hero-1200.avif 1200w">
+        <source type="image/webp" sizes="(min-width:900px) 44vw, 100vw"
+                srcset="assets/hero-800.webp 800w, assets/hero-1200.webp 1200w">
+        <!-- Hero image: never loading="lazy", it is the LCP element. -->
+        <img src="assets/hero-800.webp" width="1200" height="800" decoding="async" fetchpriority="high"
+             alt="Rooftop solar array above Cape Town, with Table Mountain silhouetted at sunset">
+      </picture>
     </div>
+  </section>
 
-    <div class="features">
-      <div class="feature"><div class="ic">🛡️</div><div><b>Vetted &amp; Reviewed</b><p>Cross-checked against SAPVIA &amp; PV GreenCard records</p></div></div>
-      <div class="feature"><div class="ic">🏢</div><div><b>Commercial Focused</b><p>Built for businesses sourcing installers</p></div></div>
-      <div class="feature"><div class="ic">⭐</div><div><b>Compare &amp; Connect</b><p>Compare installers, contact them directly</p></div></div>
-      <div class="feature"><div class="ic">🔒</div><div><b>Always Free</b><p>Free to browse — no signup required</p></div></div>
+  <section class="filters">
+    <div class="filter-grid">
+      <div class="field"><input id="q" type="search" placeholder="Search installer, city or service" aria-label="Search installers"></div>
+      <div class="field">
+        <select id="province" aria-label="Filter by province">
+          <option value="">All provinces</option>
+          <option>Western Cape</option><option>Gauteng</option><option>KwaZulu-Natal</option>
+          <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+          <option>North West</option><option>Free State</option><option>Northern Cape</option>
+        </select>
+      </div>
+      <div class="field">
+        <select id="sizeband" aria-label="Filter by system size">
+          <option value="">Any system size</option>
+          <option value="small">Up to 50 kW</option>
+          <option value="medium">50 – 500 kW</option>
+          <option value="large">500 kW and above</option>
+        </select>
+      </div>
+      <div class="field">
+        <select id="sort" aria-label="Sort results">
+          <option value="featured">Featured first</option>
+          <option value="rating">Highest rated</option>
+          <option value="years">Most experience</option>
+          <option value="name">Name (A–Z)</option>
+        </select>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="wrap ads-section" id="adsSection" style="display:none;">
-  <div class="ads-label">Featured Installers</div>
-  <div class="ads-carousel" id="adsCarousel"></div>
-  <div class="ads-dots" id="adsDots"></div>
-</div>
+  <section class="ads" id="adsSection">
+    <div class="wrap">
+      <div class="ad-head">Featured offer</div>
+      <div class="ad-carousel" id="adsCarousel"></div>
+      <div class="ad-dots" id="adsDots"></div>
+    </div>
+  </section>
 
-<main class="wrap" id="listings">
-  <div class="listing-head">
-    <h2>All Installers</h2>
-    <span class="result-count" id="resultCount">Loading…</span>
+  <div class="wrap">
+    <div class="results-head">
+      <h2 id="resultCount">Loading installers…</h2>
+      <span id="resultNote"></span>
+    </div>
+    <div class="rows" id="rows"></div>
   </div>
-  <div id="grid" class="grid"><div class="loading">Loading installers…</div></div>
 </main>
 
 <footer>
-  SolarDirectory South Africa — installer data sourced from public SAPVIA and PV GreenCard certification records. &nbsp;·&nbsp; <a href="admin.html">Admin</a>
+  <div class="wrap">
+    Installer data sourced from public SAPVIA and PV GreenCard certification records.
+    Ratings are submitted by site visitors and are not independently verified.
+    &nbsp;·&nbsp; <a href="admin.html">Admin</a>
+  </div>
 </footer>
 
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modalBody"></div>
+  <div class="modal" id="modalBody" role="dialog" aria-modal="true"></div>
 </div>
 
 <script>
   const SUPABASE_URL = "https://alogcohoopgzerrxheiw.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_TcktYEjqHMXgha4tYY8QVA_78xT1aM8";
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let sb = null;
 
-  let ALL = [];
+  let ALL = [], RATINGS = {}, CAP_MIN = 1, CAP_MAX = 1000, OPEN_ID = null;
 
-  // --- Output escaping -------------------------------------------------
-  // Every value below comes from the database and is rendered via innerHTML,
-  // so it must be escaped. safeUrl() additionally rejects anything that is
-  // not http(s), which blocks javascript: and data: URLs in href/src.
+  // --- Output escaping. Every value below comes from the database and is
+  // rendered via innerHTML, so it must be escaped. safeUrl() rejects anything
+  // that is not http(s), blocking javascript: and data: URLs in href/src.
   function esc(v){
     return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
@@ -227,169 +294,322 @@
     var s = String(u == null ? '' : u).trim();
     return /^https?:\/\//i.test(s) ? esc(s) : '';
   }
+  function siteUrl(website){
+    if(!website) return '';
+    return safeUrl('https://' + String(website).replace(/^https?:\/\//i, ''));
+  }
+  function hostOf(website){
+    return esc(String(website || '').replace(/^https?:\/\//i, '').replace(/\/$/, ''));
+  }
+
+  // A random per-browser id so one visitor cannot trivially rate the same
+  // installer repeatedly. Not authentication — clearing storage resets it.
+  function voterKey(){
+    try{
+      var k = localStorage.getItem('sd_voter');
+      if(!k){
+        k = ([1e7]+-1e3+-4e3).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        localStorage.setItem('sd_voter', k);
+      }
+      return k;
+    }catch(e){ return 'nostore-' + Math.random().toString(36).slice(2, 12); }
+  }
+  function alreadyRated(id){
+    try{ return localStorage.getItem('sd_rated_' + id) === '1'; }catch(e){ return false; }
+  }
+  function markRated(id){
+    try{ localStorage.setItem('sd_rated_' + id, '1'); }catch(e){}
+  }
 
   function initials(name){
-    return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-  }
-  function sizeLabel(r){
-    if(r.min_system_size_kw==null && r.max_system_size_kw==null) return null;
-    return `${r.min_system_size_kw ?? '?'}–${r.max_system_size_kw ?? '?'} kW`;
-  }
-  function inBand(r, band){
-    if(!band) return true;
-    const max = r.max_system_size_kw ?? 0;
-    if(band==='small') return max < 50;
-    if(band==='medium') return max >= 50 && max <= 500;
-    if(band==='large') return max > 500;
-    return true;
+    return String(name || '').split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase();
   }
   function avatarHtml(r){
     const logo = safeUrl(r.logo_url);
-    return logo ? `<img src="${logo}" alt="">` : esc(initials(r.name));
+    return logo ? `<img src="${logo}" alt="" loading="lazy" width="48" height="48">` : esc(initials(r.name));
+  }
+  function starsHtml(id){
+    const s = RATINGS[id];
+    if(!s || !s.rating_count) return '<span class="star-none">No ratings yet</span>';
+    const pct = (Number(s.rating_avg) / 5) * 100;
+    return `<span class="stars">
+      <span class="star-track" aria-hidden="true">★★★★★<span class="star-fill" style="width:${pct.toFixed(1)}%">★★★★★</span></span>
+      <span class="star-num">${esc(s.rating_avg)} <span style="color:var(--ink-faint)">(${esc(s.rating_count)})</span></span>
+    </span>`;
   }
 
-  function cardHtml(r){
-    const tags = (r.services||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-    const more = (r.services||[]).length>3 ? `<span class="tag">+${r.services.length-3} more</span>` : '';
-    const flag = r.featured_national ? '<div class="top-flag">★ #1 NATIONALLY</div>' : (r.featured_province ? '<div class="top-flag">★ TOP IN PROVINCE</div>' : '');
-    return `<div class="card ${r.featured_national?'top-national':''}" onclick="openModal('${esc(r.id)}')">
-      ${flag}
-      <div class="card-top">
-        <div class="avatar">${avatarHtml(r)}</div>
-        <div class="card-title">
-          <div class="card-title-row"><h3>${esc(r.name)}</h3>${r.verified?'<span class="verified">✓ Verified</span>':''}</div>
-          <div class="loc">${esc([r.city,r.province].filter(Boolean).join(' · '))}</div>
-        </div>
-      </div>
-      <div class="desc">${esc(r.blurb || 'Certified solar PV installer.')}</div>
-      <div class="tags">${tags}${more}</div>
-      <div class="card-stats">
-        <div class="stat">EXPERIENCE<b>${esc(r.years_in_business ? r.years_in_business+' yrs' : '—')}</b></div>
-        <div class="stat">SYSTEM SIZE<b>${esc(sizeLabel(r) || '—')}</b></div>
-        <div class="view-link">View Profile →</div>
-      </div>
+  // Signature element: plot this installer's kW range against the whole
+  // directory's range on a log scale, so 50 kW and 5 MW are both legible.
+  function capHtml(r){
+    const lo = Number(r.min_system_size_kw), hi = Number(r.max_system_size_kw);
+    if(!isFinite(lo) || !isFinite(hi) || hi <= 0) return '';
+    const L = Math.log10(Math.max(CAP_MIN, 1)), H = Math.log10(Math.max(CAP_MAX, 10));
+    const span = H - L || 1;
+    const a = Math.max(0, Math.min(100, ((Math.log10(Math.max(lo, 1)) - L) / span) * 100));
+    const b = Math.max(0, Math.min(100, ((Math.log10(Math.max(hi, 1)) - L) / span) * 100));
+    const fmt = kw => kw >= 1000 ? (kw / 1000).toFixed(kw % 1000 ? 1 : 0) + ' MW' : kw + ' kW';
+    return `<div class="cap">
+      <div class="cap-label">System size</div>
+      <div class="cap-track"><span class="cap-fill" style="left:${a.toFixed(1)}%;width:${Math.max(b - a, 1).toFixed(1)}%"></span></div>
+      <div class="cap-val">${esc(fmt(lo))} – ${esc(fmt(hi))}</div>
     </div>`;
   }
 
-  function render(list){
-    const grid = document.getElementById('grid');
-    const verifiedCount = list.filter(r=>r.verified).length;
-    document.getElementById('resultCount').textContent = verifiedCount + ' verified in results';
-    if(!list.length){ grid.innerHTML = '<div class="empty">No installers match those filters yet — try widening your search.</div>'; return; }
-    grid.innerHTML = list.map(cardHtml).join('');
+  function rowHtml(r){
+    const tags = (r.services || []).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+    const more = (r.services || []).length > 3 ? `<span class="tag">+${(r.services.length - 3)}</span>` : '';
+    const flag = r.featured_national ? '<span class="flag">Top nationally</span>'
+               : (r.featured_province ? '<span class="flag">Top in province</span>' : '');
+    const site = siteUrl(r.website);
+    return `<article class="row ${r.featured_national ? 'is-top' : ''}" onclick="openModal('${esc(r.id)}')" tabindex="0"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal('${esc(r.id)}')}">
+      <div class="avatar">${avatarHtml(r)}</div>
+      <div class="row-main">
+        <div class="row-title">
+          <h3>${esc(r.name)}</h3>
+          ${r.verified ? '<span class="verified">✓ Verified</span>' : ''}
+          ${flag}
+        </div>
+        <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}${r.years_in_business ? ' &nbsp;·&nbsp; ' + esc(r.years_in_business) + ' yrs trading' : ''}</div>
+        <div class="tags">${tags}${more}</div>
+      </div>
+      ${capHtml(r)}
+      <div class="row-side">
+        ${starsHtml(r.id)}
+        ${site ? `<span class="btn btn-outline btn-sm">View profile</span>` : `<span class="btn btn-outline btn-sm">View profile</span>`}
+      </div>
+    </article>`;
   }
 
+  function inBand(r, band){
+    if(!band) return true;
+    const max = Number(r.max_system_size_kw) || 0;
+    if(band === 'small')  return max < 50;
+    if(band === 'medium') return max >= 50 && max <= 500;
+    if(band === 'large')  return max > 500;
+    return true;
+  }
   function rankScore(r){
-    return (r.featured_national?2000000:0) + (r.featured_province?1000000:0) + (r.sort_boost||0);
+    return (r.featured_national ? 2e6 : 0) + (r.featured_province ? 1e6 : 0) + (Number(r.sort_boost) || 0);
+  }
+  function ratingOf(id){
+    const s = RATINGS[id];
+    return s && s.rating_count ? Number(s.rating_avg) : -1;
   }
 
   function applyFilters(){
     const q = document.getElementById('q').value.trim().toLowerCase();
     const province = document.getElementById('province').value;
-    const sizeband = document.getElementById('sizeband').value;
+    const band = document.getElementById('sizeband').value;
     const sort = document.getElementById('sort').value;
-    let list = ALL.filter(r=>{
+
+    let list = ALL.filter(r => {
       if(province && r.province !== province) return false;
-      if(!inBand(r, sizeband)) return false;
+      if(!inBand(r, band)) return false;
       if(q){
-        const hay = [r.name,r.city,r.province,r.blurb,(r.services||[]).join(' ')].filter(Boolean).join(' ').toLowerCase();
+        const hay = [r.name, r.city, r.province, r.blurb, (r.services || []).join(' ')]
+          .filter(Boolean).join(' ').toLowerCase();
         if(!hay.includes(q)) return false;
       }
       return true;
     });
-    if(sort==='years') list.sort((a,b)=>(b.years_in_business||0)-(a.years_in_business||0));
-    else if(sort==='province') list.sort((a,b)=>(a.province||'').localeCompare(b.province||''));
-    else if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
-    else list.sort((a,b)=> rankScore(b)-rankScore(a) || a.name.localeCompare(b.name));
+
+    if(sort === 'years')       list.sort((a,b) => (b.years_in_business||0) - (a.years_in_business||0));
+    else if(sort === 'name')   list.sort((a,b) => String(a.name).localeCompare(String(b.name)));
+    else if(sort === 'rating') list.sort((a,b) => ratingOf(b.id) - ratingOf(a.id) || String(a.name).localeCompare(String(b.name)));
+    else                       list.sort((a,b) => rankScore(b) - rankScore(a) || String(a.name).localeCompare(String(b.name)));
+
     render(list);
   }
 
-  document.getElementById('q').addEventListener('input', applyFilters);
-  document.getElementById('province').addEventListener('change', applyFilters);
-  document.getElementById('sizeband').addEventListener('change', applyFilters);
-  document.getElementById('sort').addEventListener('change', applyFilters);
+  function render(list){
+    const rows = document.getElementById('rows');
+    const head = document.getElementById('resultCount');
+    const note = document.getElementById('resultNote');
+    if(!list.length){
+      head.textContent = 'No matches';
+      note.textContent = '';
+      rows.innerHTML = '<div class="empty">No installers match those filters yet — try widening your search.</div>';
+      return;
+    }
+    head.textContent = list.length === ALL.length
+      ? `${list.length} installer${list.length === 1 ? '' : 's'}`
+      : `${list.length} of ${ALL.length} installers`;
+    note.textContent = `${list.filter(r => r.verified).length} verified in these results`;
+    rows.innerHTML = list.map(rowHtml).join('');
+  }
 
   function openModal(id){
-    const r = ALL.find(x=>x.id===id);
+    const r = ALL.find(x => x.id === id);
     if(!r) return;
-    const contactBtns = [];
-    const site = r.website ? safeUrl('https://' + String(r.website).replace(/^https?:\/\//,'')) : '';
-    if(site) contactBtns.push(`<a class="btn btn-primary" href="${site}" target="_blank" rel="noopener">Visit Website</a>`);
-    // tel: wants a dialable string — digits and a leading +, nothing else.
-    // encodeURIComponent would turn "+27 87 133 0033" into "%2B27%2087%20133%200033",
-    // which some dialers refuse.
-    const telHref = String(r.phone || '').replace(/[^\d+]/g, '');
-    if(telHref) contactBtns.push(`<a class="btn btn-ghost" href="tel:${esc(telHref)}">Call</a>`);
-    if(r.email) contactBtns.push(`<a class="btn btn-ghost" href="mailto:${esc(String(r.email).trim())}">Email</a>`);
+    OPEN_ID = id;
+    const site = siteUrl(r.website);
+    const host = hostOf(r.website);
+    const tel = String(r.phone || '').replace(/[^\d+]/g, '');
+    const mail = String(r.email || '').trim();
+
+    const alt = [];
+    if(tel)  alt.push(`<a href="tel:${esc(tel)}">${esc(r.phone)}</a>`);
+    if(mail) alt.push(`<a href="mailto:${esc(mail)}">${esc(mail)}</a>`);
+
+    const fmt = kw => kw >= 1000 ? (kw/1000).toFixed(kw % 1000 ? 1 : 0) + ' MW' : kw + ' kW';
+    const lo = Number(r.min_system_size_kw), hi = Number(r.max_system_size_kw);
+
     document.getElementById('modalBody').innerHTML = `
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <div style="clear:both;height:4px;"></div>
-      <div class="avatar" style="width:52px;height:52px;font-size:17px;margin-bottom:14px;">${avatarHtml(r)}</div>
-      <h2 style="font-size:20px;margin-bottom:4px;">${esc(r.name)} ${r.verified?'<span class="verified" style="font-size:12px;">✓ Verified</span>':''}</h2>
-      <div class="loc" style="margin-bottom:14px;">${esc([r.city,r.province].filter(Boolean).join(' · '))}</div>
-      <p style="font-size:13.5px;color:var(--text-dim);margin-bottom:16px;">${esc(r.blurb || 'Certified solar PV installer, verified against public industry records.')}</p>
-      <div class="tags" style="margin-bottom:16px;">${(r.services||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
-      <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
-        ${r.years_in_business?`<div class="stat">EXPERIENCE<b>${esc(r.years_in_business)} yrs</b></div>`:''}
-        ${sizeLabel(r)?`<div class="stat">SYSTEM SIZE<b>${esc(sizeLabel(r))}</b></div>`:''}
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+      <h2>${esc(r.name)}</h2>
+      <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}
+        ${r.verified ? ' &nbsp;<span class="verified">✓ Verified</span>' : ''}</div>
+      <p class="modal-blurb">${esc(r.blurb || 'Certified solar PV installer listed against public industry records.')}</p>
+      <div class="spec">
+        ${r.years_in_business ? `<div>Trading<b>${esc(r.years_in_business)} years</b></div>` : ''}
+        ${isFinite(lo) && isFinite(hi) ? `<div>System size<b>${esc(fmt(lo))} – ${esc(fmt(hi))}</b></div>` : ''}
+        <div>Rating<b>${RATINGS[id] && RATINGS[id].rating_count ? esc(RATINGS[id].rating_avg) + ' / 5' : '—'}</b></div>
       </div>
-      <div class="contact-row">${contactBtns.join('') || '<p style="font-size:12.5px;color:var(--text-faint);">No public contact details on file yet.</p>'}</div>
-    `;
+      <div class="tags" style="margin-bottom:17px">${(r.services||[]).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="cta-row">
+        ${site
+          ? `<a class="btn btn-primary" href="${site}" target="_blank" rel="noopener nofollow">Visit ${host} →</a>`
+          : `<span class="btn btn-outline" style="cursor:default">No website on file</span>`}
+      </div>
+      ${alt.length ? `<p class="alt-contact">Or reach them directly: ${alt.join(' &nbsp;·&nbsp; ')}</p>` : ''}
+      <div class="rate">
+        <b>Worked with ${esc(r.name)}?</b>
+        <p>Don't forget to rate your experience — it's what keeps this directory honest for the next business.</p>
+        <div class="rate-stars" id="rateStars">
+          ${[1,2,3,4,5].map(n => `<button class="rate-btn" data-n="${n}" onclick="submitRating('${esc(id)}',${n})"
+              onmouseover="litUpTo(${n})" onfocus="litUpTo(${n})" aria-label="Rate ${n} out of 5">★</button>`).join('')}
+        </div>
+        <div class="rate-msg" id="rateMsg"></div>
+      </div>`;
+
+    if(alreadyRated(id)){
+      document.getElementById('rateMsg').style.color = 'var(--volt)';
+      document.getElementById('rateMsg').textContent = 'You have already rated this installer. Thank you.';
+    }
     document.getElementById('modalOverlay').classList.add('open');
   }
-  function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+    OPEN_ID = null;
+  }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
 
-  // Ads carousel
-  let adTimer=null, adIndex=0, adSlides=[];
-  function renderAds(ads, installersById){
+  function litUpTo(n){
+    document.querySelectorAll('#rateStars .rate-btn').forEach(b => {
+      b.classList.toggle('lit', Number(b.dataset.n) <= n);
+    });
+  }
+
+  async function submitRating(id, n){
+    const msg = document.getElementById('rateMsg');
+    if(alreadyRated(id)){
+      msg.style.color = 'var(--ink-soft)';
+      msg.textContent = 'You have already rated this installer.';
+      return;
+    }
+    msg.style.color = 'var(--ink-soft)';
+    msg.textContent = 'Saving…';
+    const { error } = await sb.from('reviews').insert({ installer_id: id, rating: n, voter_key: voterKey() });
+    if(error){
+      // 23505 = unique violation: this browser key already rated this installer.
+      const dupe = error.code === '23505' || /duplicate key/i.test(error.message || '');
+      msg.style.color = dupe ? 'var(--ink-soft)' : 'var(--copper)';
+      msg.textContent = dupe ? 'You have already rated this installer.' : 'Could not save that rating. Please try again.';
+      if(dupe) markRated(id);
+      return;
+    }
+    markRated(id);
+    msg.style.color = 'var(--volt)';
+    msg.textContent = `Thank you — you rated ${n} out of 5.`;
+    await loadRatings();
+    applyFilters();
+    const spec = document.querySelector('.spec div:last-child b');
+    if(spec && RATINGS[id]) spec.textContent = RATINGS[id].rating_avg + ' / 5';
+  }
+
+  async function loadRatings(){
+    const { data, error } = await sb.from('installer_ratings').select('*');
+    if(error){ console.error('ratings', error); return; }
+    RATINGS = {};
+    (data || []).forEach(r => { RATINGS[r.installer_id] = r; });
+  }
+
+  let adTimer = null, adIndex = 0, adSlides = [];
+  function renderAds(ads, byId){
     if(!ads.length) return;
-    document.getElementById('adsSection').style.display = 'block';
     const carousel = document.getElementById('adsCarousel');
     const dots = document.getElementById('adsDots');
-    carousel.innerHTML = ads.map((ad,i)=>{
-      const inst = ad.installer_id ? installersById[ad.installer_id] : null;
-      const instLogo = inst ? safeUrl(inst.logo_url) : '';
-      const logo = instLogo ? `<img src="${instLogo}" alt="">` : '⭐';
-      const link = safeUrl(ad.cta_url) || (inst && inst.website ? safeUrl('https://'+String(inst.website).replace(/^https?:\/\//,'')) : '') || '#';
-      return `<a class="ad-slide ${i===0?'show':''}" href="${link}" target="_blank" rel="noopener" data-i="${i}">
-        <div class="ad-logo">${logo}</div>
+    document.getElementById('adsSection').style.display = 'block';
+    carousel.innerHTML = ads.map((ad, i) => {
+      const inst = ad.installer_id ? byId[ad.installer_id] : null;
+      const logo = inst ? safeUrl(inst.logo_url) : '';
+      const link = safeUrl(ad.cta_url) || (inst ? siteUrl(inst.website) : '') || '';
+      const inner = `<div class="ad-logo">${logo ? `<img src="${logo}" alt="" loading="lazy">` : '★'}</div>
         <div class="ad-body">
-          <b>${esc(ad.title)}${ad.discount_text?`<span class="disc">${esc(ad.discount_text)}</span>`:''}</b>
-          <p>${esc(ad.subtitle||'')}</p>
-        </div>
-      </a>`;
+          <b>${esc(ad.title)}${ad.discount_text ? `<span class="disc">${esc(ad.discount_text)}</span>` : ''}</b>
+          <p>${esc(ad.subtitle || '')}</p>
+        </div>`;
+      return link
+        ? `<a class="ad-slide ${i === 0 ? 'show' : ''}" href="${link}" target="_blank" rel="noopener nofollow">${inner}</a>`
+        : `<div class="ad-slide ${i === 0 ? 'show' : ''}">${inner}</div>`;
     }).join('');
-    dots.innerHTML = ads.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('');
+    dots.innerHTML = ads.map((_, i) => `<span class="${i === 0 ? 'on' : ''}"></span>`).join('');
     adSlides = Array.from(carousel.querySelectorAll('.ad-slide'));
     adIndex = 0;
-    if(ads.length>1){
-      adTimer = setInterval(()=>{
+    if(ads.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      adTimer = setInterval(() => {
         adSlides[adIndex].classList.remove('show');
         dots.children[adIndex].classList.remove('on');
-        adIndex = (adIndex+1) % adSlides.length;
+        adIndex = (adIndex + 1) % adSlides.length;
         adSlides[adIndex].classList.add('show');
         dots.children[adIndex].classList.add('on');
       }, 6000);
     }
   }
 
+  function setStats(){
+    document.getElementById('statCount').textContent = ALL.length;
+    document.getElementById('statVerified').textContent = ALL.filter(r => r.verified).length;
+    document.getElementById('statProvinces').textContent = new Set(ALL.map(r => r.province).filter(Boolean)).size;
+  }
+
   async function load(){
-    const [{ data, error }, settingsRes, adsRes] = await Promise.all([
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const [instRes, settingsRes, adsRes] = await Promise.all([
       sb.from('installers').select('*').order('name'),
-      sb.from('settings').select('*').eq('key','ads_enabled').maybeSingle(),
+      sb.from('settings').select('*').eq('key', 'ads_enabled').maybeSingle(),
       sb.from('ads').select('*').order('display_order')
     ]);
-    if(error){ document.getElementById('grid').innerHTML = '<div class="empty">Could not load installers. Please refresh.</div>'; console.error(error); return; }
-    ALL = data;
+    if(instRes.error){
+      document.getElementById('resultCount').textContent = 'Could not load installers';
+      document.getElementById('rows').innerHTML = '<div class="empty">Something went wrong loading the directory. Please refresh.</div>';
+      console.error(instRes.error);
+      return;
+    }
+    ALL = instRes.data || [];
+    const mins = ALL.map(r => Number(r.min_system_size_kw)).filter(n => isFinite(n) && n > 0);
+    const maxs = ALL.map(r => Number(r.max_system_size_kw)).filter(n => isFinite(n) && n > 0);
+    CAP_MIN = mins.length ? Math.min.apply(null, mins) : 1;
+    CAP_MAX = maxs.length ? Math.max.apply(null, maxs) : 1000;
+
+    setStats();
+    await loadRatings();
     applyFilters();
 
-    const adsEnabled = !settingsRes.error && settingsRes.data && settingsRes.data.value === 'true';
-    if(adsEnabled && !adsRes.error && adsRes.data && adsRes.data.length){
-      const byId = {}; ALL.forEach(r=>byId[r.id]=r);
+    const on = !settingsRes.error && settingsRes.data && settingsRes.data.value === 'true';
+    if(on && !adsRes.error && adsRes.data && adsRes.data.length){
+      const byId = {}; ALL.forEach(r => byId[r.id] = r);
       renderAds(adsRes.data, byId);
     }
   }
-  load();
+
+  ['q','province','sizeband','sort'].forEach(id => {
+    document.getElementById(id).addEventListener(id === 'q' ? 'input' : 'change', applyFilters);
+  });
+
+  window.addEventListener('load', load);
 </script>
 </body>
 </html>
