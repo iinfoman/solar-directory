@@ -55,10 +55,9 @@
   /* ---------- header ---------- */
   header{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:1px solid var(--rule);}
   .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 20px;max-width:1120px;margin:0 auto;}
-  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .brand .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#F5A623,#F7931E);display:grid;place-items:center;font-size:19px;line-height:1;flex-shrink:0;}
-  .brand b{font-family:'Archivo',sans-serif;font-size:15.5px;font-weight:800;display:block;line-height:1.15;}
-  .brand span{font-size:11px;color:var(--ink-faint);display:block;line-height:1.2;}
+  .brand{display:flex;align-items:center;min-width:0;}
+  .brand-logo{height:38px;width:auto;display:block;}
+  @media(max-width:430px){.brand-logo{height:30px;}}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
   .btn-primary{background:var(--copper);color:#fff;}
   .btn-primary:hover{background:var(--copper-dark);}
@@ -193,11 +192,12 @@
 <header>
   <div class="nav">
     <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true">☀️</span>
-      <span>
-        <b>SolarDirectory</b>
-        <span>South Africa</span>
-      </span>
+      <picture>
+        <source type="image/avif" srcset="assets/logo.avif">
+        <source type="image/webp" srcset="assets/logo.webp">
+        <img class="brand-logo" src="assets/logo.png" width="432" height="120"
+             alt="SolarDirectory South Africa">
+      </picture>
     </a>
     <a class="btn btn-primary btn-sm" href="mailto:hello@solardirectorysa.co.za?subject=List%20my%20business">List your business</a>
   </div>
