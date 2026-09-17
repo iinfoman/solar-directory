@@ -38,7 +38,7 @@
     --paper:#FFFFFF; --paper-sunk:#F2F4F3;
     --ink:#16211F; --ink-soft:#5A6866; --ink-faint:#8B9895;
     --rule:#DDE3E1; --rule-soft:#EBEFEE;
-    --copper:#B4531F; --copper-dark:#8E3F14; --copper-wash:#FBF1EC;
+    --copper:#B4531F; --copper-dark:#8E3F14; --copper-wash:#FBF1EC; --copper-lit:#F0864A;
     --volt:#1D7A4C; --volt-wash:#EEF7F2;
     --focus:#16211F;
   }
@@ -56,8 +56,7 @@
   header{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:1px solid var(--rule);}
   .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 20px;max-width:1120px;margin:0 auto;}
   .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--copper);display:grid;place-items:center;flex-shrink:0;}
-  .brand-mark svg{width:17px;height:17px;fill:#fff;}
+  .brand .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#F5A623,#F7931E);display:grid;place-items:center;font-size:19px;line-height:1;flex-shrink:0;}
   .brand b{font-family:'Archivo',sans-serif;font-size:15.5px;font-weight:800;display:block;line-height:1.15;}
   .brand span{font-size:11px;color:var(--ink-faint);display:block;line-height:1.2;}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
@@ -68,16 +67,28 @@
   .btn-sm{padding:7px 13px;font-size:12.5px;}
 
   /* ---------- hero ---------- */
-  .hero{padding:52px 0 34px;border-bottom:1px solid var(--rule-soft);}
-  .hero-grid{display:grid;gap:26px;align-items:center;}
-  @media(min-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,44%);gap:44px;}}
-  .hero-shot{display:block;min-width:0;}
-  .hero-shot img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:12px;border:1px solid var(--rule);}
+  .hero{position:relative;overflow:hidden;padding:54px 0 42px;border-bottom:1px solid var(--rule-soft);}
+  /* The photograph sits behind the words, as it did in the dark design. It is
+     absolutely positioned, so it reserves no layout and cannot shift the text. */
+  .hero-media{position:absolute;inset:0;z-index:0;}
+  .hero-media img{width:100%;height:100%;object-fit:cover;object-position:center 45%;}
+  /* The scrim is what makes white text legible over a sunset. Vertical on
+     mobile where the copy spans the full width, raked to the left on wider
+     screens so the mountain and the array stay visible on the right. */
+  .hero-scrim{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(11,17,16,.88) 0%,rgba(11,17,16,.80) 55%,rgba(11,17,16,.86) 100%);}
+  .hero-inner{position:relative;z-index:2;}
+  @media(min-width:900px){
+    .hero{padding:76px 0 62px;}
+    .hero-scrim{background:linear-gradient(90deg,rgba(11,17,16,.93) 0%,rgba(11,17,16,.85) 40%,rgba(11,17,16,.45) 74%,rgba(11,17,16,.24) 100%);}
+  }
   h1{font-size:clamp(30px,5.4vw,50px);font-weight:800;line-height:1.06;max-width:15ch;}
   h1 em{font-style:normal;color:var(--copper);}
-  .hero p{color:var(--ink-soft);font-size:16px;max-width:52ch;margin-top:16px;}
-  .hero-meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font-size:13px;color:var(--ink-soft);}
-  .hero-meta b{font-weight:600;color:var(--ink);}
+  .hero h1{color:#FFFFFF;text-shadow:0 1px 24px rgba(0,0,0,.45);}
+  .hero h1 em{color:var(--copper-lit);}
+  .hero p{color:#D9DEDC;font-size:16px;max-width:52ch;margin-top:16px;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font-size:13px;color:#BFC8C5;}
+  .hero-meta b{font-weight:600;color:#FFFFFF;display:inline-block;min-width:2ch;}
 
   /* ---------- filters ---------- */
   .filters{position:sticky;top:59px;z-index:50;background:var(--paper-sunk);border-bottom:1px solid var(--rule);padding:12px 0;}
@@ -182,7 +193,7 @@
 <header>
   <div class="nav">
     <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M17.5 5 9 18h5.5L13.5 27 22 14h-5.5z"/></svg></span>
+      <span class="brand-mark" aria-hidden="true">☀️</span>
       <span>
         <b>SolarDirectory</b>
         <span>South Africa</span>
@@ -194,25 +205,24 @@
 
 <main>
   <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
-        <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
-        <div class="hero-meta">
-          <span><b id="statCount">—</b> installers listed</span>
-          <span><b id="statVerified">—</b> verified</span>
-          <span><b id="statProvinces">—</b> provinces covered</span>
-        </div>
+    <picture class="hero-media">
+      <source type="image/avif" sizes="100vw"
+              srcset="assets/hero-800.avif 800w, assets/hero-1200.avif 1200w, assets/hero-1536.avif 1536w">
+      <source type="image/webp" sizes="100vw"
+              srcset="assets/hero-800.webp 800w, assets/hero-1200.webp 1200w, assets/hero-1536.webp 1536w">
+      <!-- Hero image: never loading="lazy", it is the LCP element. -->
+      <img src="assets/hero-1200.webp" width="1536" height="1024" decoding="async" fetchpriority="high"
+           alt="Rooftop solar array above Cape Town, with Table Mountain silhouetted at sunset">
+    </picture>
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
+      <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
+      <div class="hero-meta">
+        <span><b id="statCount">—</b> installers listed</span>
+        <span><b id="statVerified">—</b> verified</span>
+        <span><b id="statProvinces">—</b> provinces covered</span>
       </div>
-      <picture class="hero-shot">
-        <source type="image/avif" sizes="(min-width:900px) 44vw, 100vw"
-                srcset="assets/hero-800.avif 800w, assets/hero-1200.avif 1200w">
-        <source type="image/webp" sizes="(min-width:900px) 44vw, 100vw"
-                srcset="assets/hero-800.webp 800w, assets/hero-1200.webp 1200w">
-        <!-- Hero image: never loading="lazy", it is the LCP element. -->
-        <img src="assets/hero-800.webp" width="1200" height="800" decoding="async" fetchpriority="high"
-             alt="Rooftop solar array above Cape Town, with Table Mountain silhouetted at sunset">
-      </picture>
     </div>
   </section>
 
