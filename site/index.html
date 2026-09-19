@@ -400,8 +400,7 @@
     head.textContent = list.length === ALL.length
       ? `${list.length} installer${list.length === 1 ? '' : 's'}`
       : `${list.length} of ${ALL.length} installers`;
-    const contactable = list.filter(r => r.website || r.phone || r.email).length;
-    note.textContent = `${contactable} with contact details`;
+    note.textContent = `${list.filter(r => r.website).length} with a website`;
     rows.innerHTML = list.map(rowHtml).join('');
   }
 
@@ -547,7 +546,10 @@
       console.error(instRes.error);
       return;
     }
-    ALL = instRes.data || [];
+    // A listing nobody can contact is a dead end for a visitor, so the
+    // directory only shows rows with a website, phone or email. The rest stay
+    // in the database and in the admin panel until someone fills them in.
+    ALL = (instRes.data || []).filter(r => r.website || r.phone || r.email);
     setStats();
     await loadRatings();
     applyFilters();
