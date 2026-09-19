@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SolarDirectory South Africa — Vetted Commercial Solar Installers</title>
-<meta name="description" content="Compare vetted commercial and industrial solar PV installers across South Africa by province, system size and services. Independent directory of certified installers.">
+<meta name="description" content="Find PV GreenCard certified solar PV installers across South Africa, listed by province. An independent directory sourced from public certification records.">
 <link rel="canonical" href="https://solardirectorysa.co.za/">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SolarDirectory South Africa">
 <meta property="og:title" content="SolarDirectory South Africa — Vetted Commercial Solar Installers">
-<meta property="og:description" content="Compare vetted commercial and industrial solar PV installers across South Africa by province, system size and services.">
+<meta property="og:description" content="Find PV GreenCard certified solar PV installers across South Africa, listed by province.">
 <meta property="og:url" content="https://solardirectorysa.co.za/">
 <meta property="og:locale" content="en_ZA">
 <meta name="twitter:card" content="summary">
@@ -92,7 +92,7 @@
   /* ---------- filters ---------- */
   .filters{position:sticky;top:59px;z-index:50;background:var(--paper-sunk);border-bottom:1px solid var(--rule);padding:12px 0;}
   .filter-grid{display:grid;gap:8px;grid-template-columns:1fr;max-width:1120px;margin:0 auto;padding:0 20px;}
-  @media(min-width:760px){.filter-grid{grid-template-columns:2fr 1fr 1fr 1fr;}}
+  @media(min-width:760px){.filter-grid{grid-template-columns:2fr 1fr 1fr;}}
   .field{position:relative;min-width:0;}
   .field input,.field select{width:100%;background:var(--paper);border:1px solid var(--rule);color:var(--ink);font-family:inherit;font-size:14px;padding:11px 13px;border-radius:8px;appearance:none;}
   .field select{padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5 6 8.5 10 4.5' stroke='%235A6866' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;background-size:12px;}
@@ -109,7 +109,7 @@
   .row.is-top{background:var(--copper-wash);}
   .row.is-top:hover{background:#F8E9E1;}
   @media(min-width:860px){
-    .row{grid-template-columns:48px minmax(0,1fr) 190px 150px;gap:18px;align-items:center;}
+    .row{grid-template-columns:48px minmax(0,1fr) 150px;gap:18px;align-items:center;}
   }
   .avatar{width:44px;height:44px;border-radius:9px;background:var(--paper-sunk);border:1px solid var(--rule);display:grid;place-items:center;font-family:'Archivo',sans-serif;font-size:14px;font-weight:700;color:var(--ink-soft);overflow:hidden;flex-shrink:0;}
   @media(min-width:860px){.avatar{width:48px;height:48px;}}
@@ -123,14 +123,6 @@
   .loc{font-size:13px;color:var(--ink-soft);margin-top:3px;}
   .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
   .tag{font-size:11.5px;color:var(--ink-soft);border:1px solid var(--rule);padding:3px 8px;border-radius:4px;}
-
-  /* signature element: capacity scale */
-  .cap{margin-top:12px;grid-column:2/-1;}
-  @media(min-width:860px){.cap{margin-top:0;grid-column:auto;}}
-  .cap-label{font-size:11px;color:var(--ink-faint);letter-spacing:.05em;text-transform:uppercase;font-weight:600;margin-bottom:5px;}
-  .cap-track{position:relative;height:7px;background:var(--paper-sunk);border:1px solid var(--rule);border-radius:4px;overflow:hidden;}
-  .cap-fill{position:absolute;top:0;bottom:0;background:var(--copper);border-radius:3px;min-width:3px;}
-  .cap-val{font-size:12.5px;color:var(--ink);font-weight:600;margin-top:5px;}
 
   .row-side{display:flex;flex-direction:column;gap:8px;margin-top:12px;grid-column:2/-1;}
   @media(min-width:860px){.row-side{margin-top:0;align-items:flex-end;grid-column:auto;}}
@@ -217,10 +209,9 @@
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="wrap hero-inner">
       <h1>Commercial solar installers, <em>checked before they're listed</em></h1>
-      <p>Compare certified solar PV contractors for your business — by province, by system size, and by what they actually build.</p>
+      <p>Certified solar PV installers for your business, listed by province — every one drawn from the public PV GreenCard certification records.</p>
       <div class="hero-meta">
         <span><b id="statCount">—</b> installers listed</span>
-        <span><b id="statVerified">—</b> verified</span>
         <span><b id="statProvinces">—</b> provinces covered</span>
       </div>
     </div>
@@ -238,18 +229,9 @@
         </select>
       </div>
       <div class="field">
-        <select id="sizeband" aria-label="Filter by system size">
-          <option value="">Any system size</option>
-          <option value="small">Up to 50 kW</option>
-          <option value="medium">50 – 500 kW</option>
-          <option value="large">500 kW and above</option>
-        </select>
-      </div>
-      <div class="field">
         <select id="sort" aria-label="Sort results">
           <option value="featured">Featured first</option>
           <option value="rating">Highest rated</option>
-          <option value="years">Most experience</option>
           <option value="name">Name (A–Z)</option>
         </select>
       </div>
@@ -275,7 +257,8 @@
 
 <footer>
   <div class="wrap">
-    Installer data sourced from public SAPVIA and PV GreenCard certification records.
+    Installer data sourced from the public PV GreenCard certified installer directory.
+    A listing records certification only — it is not a recommendation, and contact details are shown where published.
     Ratings are submitted by site visitors and are not independently verified.
     &nbsp;·&nbsp; <a href="admin.html">Admin</a>
   </div>
@@ -290,7 +273,7 @@
   const SUPABASE_ANON_KEY = "sb_publishable_TcktYEjqHMXgha4tYY8QVA_78xT1aM8";
   let sb = null;
 
-  let ALL = [], RATINGS = {}, CAP_MIN = 1, CAP_MAX = 1000, OPEN_ID = null;
+  let ALL = [], RATINGS = {}, OPEN_ID = null;
 
   // --- Output escaping. Every value below comes from the database and is
   // rendered via innerHTML, so it must be escaped. safeUrl() rejects anything
@@ -349,23 +332,6 @@
     </span>`;
   }
 
-  // Signature element: plot this installer's kW range against the whole
-  // directory's range on a log scale, so 50 kW and 5 MW are both legible.
-  function capHtml(r){
-    const lo = Number(r.min_system_size_kw), hi = Number(r.max_system_size_kw);
-    if(!isFinite(lo) || !isFinite(hi) || hi <= 0) return '';
-    const L = Math.log10(Math.max(CAP_MIN, 1)), H = Math.log10(Math.max(CAP_MAX, 10));
-    const span = H - L || 1;
-    const a = Math.max(0, Math.min(100, ((Math.log10(Math.max(lo, 1)) - L) / span) * 100));
-    const b = Math.max(0, Math.min(100, ((Math.log10(Math.max(hi, 1)) - L) / span) * 100));
-    const fmt = kw => kw >= 1000 ? (kw / 1000).toFixed(kw % 1000 ? 1 : 0) + ' MW' : kw + ' kW';
-    return `<div class="cap">
-      <div class="cap-label">System size</div>
-      <div class="cap-track"><span class="cap-fill" style="left:${a.toFixed(1)}%;width:${Math.max(b - a, 1).toFixed(1)}%"></span></div>
-      <div class="cap-val">${esc(fmt(lo))} – ${esc(fmt(hi))}</div>
-    </div>`;
-  }
-
   function rowHtml(r){
     const tags = (r.services || []).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
     const more = (r.services || []).length > 3 ? `<span class="tag">+${(r.services.length - 3)}</span>` : '';
@@ -378,13 +344,12 @@
       <div class="row-main">
         <div class="row-title">
           <h3>${esc(r.name)}</h3>
-          ${r.verified ? '<span class="verified">✓ Verified</span>' : ''}
+          ${r.verified ? '<span class="verified">PV GreenCard listed</span>' : ''}
           ${flag}
         </div>
-        <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}${r.years_in_business ? ' &nbsp;·&nbsp; ' + esc(r.years_in_business) + ' yrs trading' : ''}</div>
+        <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}</div>
         <div class="tags">${tags}${more}</div>
       </div>
-      ${capHtml(r)}
       <div class="row-side">
         ${starsHtml(r.id)}
         ${site ? `<span class="btn btn-outline btn-sm">View profile</span>` : `<span class="btn btn-outline btn-sm">View profile</span>`}
@@ -392,14 +357,6 @@
     </article>`;
   }
 
-  function inBand(r, band){
-    if(!band) return true;
-    const max = Number(r.max_system_size_kw) || 0;
-    if(band === 'small')  return max < 50;
-    if(band === 'medium') return max >= 50 && max <= 500;
-    if(band === 'large')  return max > 500;
-    return true;
-  }
   function rankScore(r){
     return (r.featured_national ? 2e6 : 0) + (r.featured_province ? 1e6 : 0) + (Number(r.sort_boost) || 0);
   }
@@ -411,12 +368,10 @@
   function applyFilters(){
     const q = document.getElementById('q').value.trim().toLowerCase();
     const province = document.getElementById('province').value;
-    const band = document.getElementById('sizeband').value;
     const sort = document.getElementById('sort').value;
 
     let list = ALL.filter(r => {
       if(province && r.province !== province) return false;
-      if(!inBand(r, band)) return false;
       if(q){
         const hay = [r.name, r.city, r.province, r.blurb, (r.services || []).join(' ')]
           .filter(Boolean).join(' ').toLowerCase();
@@ -425,8 +380,7 @@
       return true;
     });
 
-    if(sort === 'years')       list.sort((a,b) => (b.years_in_business||0) - (a.years_in_business||0));
-    else if(sort === 'name')   list.sort((a,b) => String(a.name).localeCompare(String(b.name)));
+    if(sort === 'name')        list.sort((a,b) => String(a.name).localeCompare(String(b.name)));
     else if(sort === 'rating') list.sort((a,b) => ratingOf(b.id) - ratingOf(a.id) || String(a.name).localeCompare(String(b.name)));
     else                       list.sort((a,b) => rankScore(b) - rankScore(a) || String(a.name).localeCompare(String(b.name)));
 
@@ -446,7 +400,8 @@
     head.textContent = list.length === ALL.length
       ? `${list.length} installer${list.length === 1 ? '' : 's'}`
       : `${list.length} of ${ALL.length} installers`;
-    note.textContent = `${list.filter(r => r.verified).length} verified in these results`;
+    const contactable = list.filter(r => r.website || r.phone || r.email).length;
+    note.textContent = `${contactable} with contact details`;
     rows.innerHTML = list.map(rowHtml).join('');
   }
 
@@ -463,18 +418,13 @@
     if(tel)  alt.push(`<a href="tel:${esc(tel)}">${esc(r.phone)}</a>`);
     if(mail) alt.push(`<a href="mailto:${esc(mail)}">${esc(mail)}</a>`);
 
-    const fmt = kw => kw >= 1000 ? (kw/1000).toFixed(kw % 1000 ? 1 : 0) + ' MW' : kw + ' kW';
-    const lo = Number(r.min_system_size_kw), hi = Number(r.max_system_size_kw);
-
     document.getElementById('modalBody').innerHTML = `
       <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
       <h2>${esc(r.name)}</h2>
       <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}
-        ${r.verified ? ' &nbsp;<span class="verified">✓ Verified</span>' : ''}</div>
+        ${r.verified ? ' &nbsp;<span class="verified">PV GreenCard listed</span>' : ''}</div>
       <p class="modal-blurb">${esc(r.blurb || 'Certified solar PV installer listed against public industry records.')}</p>
       <div class="spec">
-        ${r.years_in_business ? `<div>Trading<b>${esc(r.years_in_business)} years</b></div>` : ''}
-        ${isFinite(lo) && isFinite(hi) ? `<div>System size<b>${esc(fmt(lo))} – ${esc(fmt(hi))}</b></div>` : ''}
         <div>Rating<b>${RATINGS[id] && RATINGS[id].rating_count ? esc(RATINGS[id].rating_avg) + ' / 5' : '—'}</b></div>
       </div>
       <div class="tags" style="margin-bottom:17px">${(r.services||[]).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
@@ -581,7 +531,6 @@
 
   function setStats(){
     document.getElementById('statCount').textContent = ALL.length;
-    document.getElementById('statVerified').textContent = ALL.filter(r => r.verified).length;
     document.getElementById('statProvinces').textContent = new Set(ALL.map(r => r.province).filter(Boolean)).size;
   }
 
@@ -599,11 +548,6 @@
       return;
     }
     ALL = instRes.data || [];
-    const mins = ALL.map(r => Number(r.min_system_size_kw)).filter(n => isFinite(n) && n > 0);
-    const maxs = ALL.map(r => Number(r.max_system_size_kw)).filter(n => isFinite(n) && n > 0);
-    CAP_MIN = mins.length ? Math.min.apply(null, mins) : 1;
-    CAP_MAX = maxs.length ? Math.max.apply(null, maxs) : 1000;
-
     setStats();
     await loadRatings();
     applyFilters();
@@ -615,7 +559,7 @@
     }
   }
 
-  ['q','province','sizeband','sort'].forEach(id => {
+  ['q','province','sort'].forEach(id => {
     document.getElementById(id).addEventListener(id === 'q' ? 'input' : 'change', applyFilters);
   });
 
