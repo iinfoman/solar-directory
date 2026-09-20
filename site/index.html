@@ -76,14 +76,14 @@
      the feather is what keeps the copy clear of it. */
   .hero{position:relative;overflow:hidden;
     background:linear-gradient(165deg,#E8F3FC 0%,#F4FAFE 52%,#FFFFFF 100%);}
-  .hero-media{position:absolute;top:0;right:0;width:63%;height:52%;z-index:0;
-    -webkit-mask-image:radial-gradient(120% 118% at 100% 0%,#000 46%,rgba(0,0,0,.55) 70%,transparent 92%);
-            mask-image:radial-gradient(120% 118% at 100% 0%,#000 46%,rgba(0,0,0,.55) 70%,transparent 92%);}
+  .hero-media{position:absolute;top:0;right:0;width:78%;height:62%;z-index:0;
+    -webkit-mask-image:radial-gradient(86% 92% at 100% 0%,#000 34%,rgba(0,0,0,.72) 54%,rgba(0,0,0,.28) 74%,transparent 92%);
+            mask-image:radial-gradient(86% 92% at 100% 0%,#000 34%,rgba(0,0,0,.72) 54%,rgba(0,0,0,.28) 74%,transparent 92%);}
   .hero-media img{width:100%;height:100%;object-fit:cover;object-position:52% 62%;}
   @media(min-width:900px){
-    .hero-media{top:-4%;right:-2%;width:58%;height:104%;
-      -webkit-mask-image:radial-gradient(118% 118% at 100% 12%,#000 56%,rgba(0,0,0,.55) 76%,transparent 95%);
-              mask-image:radial-gradient(118% 118% at 100% 12%,#000 56%,rgba(0,0,0,.55) 76%,transparent 95%);}
+    .hero-media{top:-4%;right:0;width:68%;height:108%;
+      -webkit-mask-image:radial-gradient(88% 96% at 100% 10%,#000 40%,rgba(0,0,0,.7) 60%,rgba(0,0,0,.25) 78%,transparent 94%);
+              mask-image:radial-gradient(88% 96% at 100% 10%,#000 40%,rgba(0,0,0,.7) 60%,rgba(0,0,0,.25) 78%,transparent 94%);}
     .hero-media img{object-position:58% 58%;}
   }
   /* the arc from the reference: over the sky, behind nothing */
@@ -125,12 +125,6 @@
   .prop b{display:block;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:700;color:var(--navy);line-height:1.25;}
   .prop span{display:block;font-size:12px;color:var(--ink-2);margin-top:2px;}
 
-  /* ---------- counts ---------- */
-  .counts{background:var(--navy);color:#fff;}
-  .counts-in{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:18px 0;text-align:center;}
-  .counts b{display:block;font-family:'Poppins',sans-serif;font-size:clamp(20px,4.6vw,28px);font-weight:800;color:var(--sun);line-height:1.1;font-variant-numeric:tabular-nums;}
-  .counts span{display:block;font-size:12px;color:#B9CBDC;margin-top:3px;}
-
   /* ---------- results ---------- */
   .results{background:var(--sky-2);padding:26px 0 52px;}
   .results-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
@@ -143,14 +137,13 @@
   .cards{display:grid;gap:14px;grid-template-columns:1fr;}
   @media(min-width:760px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));}}
   @media(min-width:1040px){.cards{grid-template-columns:repeat(3,minmax(0,1fr));}}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card);padding:16px;display:flex;flex-direction:column;box-shadow:var(--shadow-card);transition:box-shadow .2s cubic-bezier(.25,.46,.45,.94),border-color .2s;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card);padding:16px;display:flex;flex-direction:column;box-shadow:var(--shadow-card);cursor:pointer;transition:box-shadow .2s cubic-bezier(.25,.46,.45,.94),border-color .2s;}
   .card:hover{box-shadow:var(--shadow-lift);border-color:var(--line-2);}
   .card-top{display:flex;gap:12px;align-items:flex-start;}
   .avatar{width:50px;height:50px;border-radius:var(--r-tile);background:var(--sky);border:1px solid var(--line);display:grid;place-items:center;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--navy-2);overflow:hidden;flex-shrink:0;}
   .avatar img{width:100%;height:100%;object-fit:contain;}
   .card h3{font-size:16px;font-weight:700;line-height:1.3;color:var(--navy);}
-  .card h3 button{background:none;border:0;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer;}
-  .card h3 button:hover{color:var(--navy-2);text-decoration:underline;}
+  .card:hover h3{color:var(--navy-2);}
   .loc{font-size:13px;color:var(--ink-2);margin-top:3px;}
   .listed{display:inline-flex;align-items:center;gap:4px;margin-top:7px;font-size:11.5px;font-weight:600;color:var(--trust);background:var(--trust-tint);padding:3px 9px;border-radius:999px;}
   .listed svg{width:13px;height:13px;}
@@ -290,14 +283,6 @@
     </div>
   </section>
 
-  <section class="counts">
-    <div class="wrap counts-in">
-      <div><b id="statCount">—</b><span>Listed installers</span></div>
-      <div><b id="statProvinces">—</b><span>Provinces covered</span></div>
-      <div><b id="statSites">—</b><span>With a website</span></div>
-    </div>
-  </section>
-
   <section class="ads" id="adsSection" hidden>
     <div class="wrap">
       <div class="ad-head">Featured offer</div>
@@ -421,11 +406,14 @@
   function rowHtml(r){
     const tags = (r.services || []).slice(0,3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
     const more = (r.services || []).length > 3 ? `<span class="tag">+${(r.services.length - 3)}</span>` : '';
-    return `<article class="card">
+    return `<article class="card" role="button" tabindex="0"
+             aria-label="View ${esc(r.name)}"
+             onclick="cardOpen(event,'${esc(r.id)}')"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openModal('${esc(r.id)}')}">
       <div class="card-top">
         <div class="avatar">${avatarHtml(r)}</div>
         <div style="min-width:0">
-          <h3><button type="button" onclick="openModal('${esc(r.id)}')">${esc(r.name)}</button></h3>
+          <h3>${esc(r.name)}</h3>
           <div class="loc">${esc([r.city, r.province].filter(Boolean).join(', '))}</div>
           ${r.verified ? '<span class="listed"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4.5 4.5L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>PV GreenCard listed</span>' : ''}
         </div>
@@ -436,6 +424,13 @@
         ${contactHtml(r, false)}
       </div>
     </article>`;
+  }
+
+  // The card is the target, but the contact buttons inside it are not —
+  // tapping Call must dial, not open the profile behind it.
+  function cardOpen(e, id){
+    if(e.target.closest('a')) return;
+    openModal(id);
   }
 
   function rankScore(r){
@@ -580,10 +575,7 @@
   }
 
   function setStats(){
-    document.getElementById('statCount').textContent = ALL.length;
     const provinces = new Set(ALL.map(r => r.province).filter(Boolean)).size;
-    document.getElementById('statProvinces').textContent = provinces;
-    document.getElementById('statSites').textContent = ALL.filter(r => r.website).length;
     const words = ['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine'];
     document.getElementById('propProv').textContent = (words[provinces] || provinces) + ' province' + (provinces === 1 ? '' : 's');
   }
