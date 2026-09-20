@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List your solar business — SolarDirectory South Africa</title>
+<meta name="description" content="Add your solar installation business to SolarDirectory South Africa, or claim and correct a listing that is already there.">
+<link rel="canonical" href="https://solardirectorysa.co.za/list.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230E2A47'/><circle cx='16' cy='12' r='5' fill='%23F5B324'/><path d='M6 26l4-8h12l4 8z' fill='%231B4B7A'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<style>
+  :root{
+    --navy:#0E2A47; --navy-2:#1B4B7A;
+    --sun:#F5B324; --sun-deep:#DF9C09; --sun-tint:#FEF4DE;
+    --sky:#EAF3FB; --sky-2:#F5F9FD;
+    --paper:#FFFFFF; --ink:#12212F; --ink-2:#5A6B7D; --ink-3:#8B99A8;
+    --line:#E2E9F0; --line-2:#CFDAE5;
+    --trust:#0F6B4F; --trust-tint:#E7F2EC;
+    --stop:#A3301F; --stop-tint:#FBEDEA;
+    --r-card:16px;
+    --shadow:0 2px 6px rgba(14,42,71,.06), 0 18px 44px rgba(14,42,71,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--sky-2);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Poppins','Inter',sans-serif;letter-spacing:-.02em;}
+  a{color:inherit;}
+  button{font:inherit;color:inherit;cursor:pointer;}
+  :focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:4px;}
+  .wrap{max-width:660px;margin:0 auto;padding:0 20px;}
+
+  header{background:var(--paper);border-bottom:1px solid var(--line);}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:1180px;margin:0 auto;padding:11px 20px;}
+  .brand-logo{height:36px;width:auto;display:block;}
+  .back{font-size:13.5px;font-weight:600;color:var(--navy-2);}
+
+  .head{padding-block:32px 22px;}
+  h1{font-size:clamp(26px,5.6vw,36px);font-weight:800;color:var(--navy);line-height:1.12;}
+  .lede{color:var(--ink-2);margin-top:10px;}
+
+  form{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px;margin-bottom:40px;}
+  fieldset{border:0;margin-bottom:18px;}
+  legend{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px;}
+  .req{color:var(--stop);}
+  input,select,textarea{width:100%;min-height:46px;background:var(--paper);border:1px solid var(--line-2);border-radius:12px;
+    font-family:inherit;font-size:15px;color:var(--ink);padding:11px 13px;}
+  textarea{min-height:100px;resize:vertical;}
+  .row{margin-bottom:14px;}
+  .two{display:grid;gap:14px;grid-template-columns:1fr;}
+  @media(min-width:560px){.two{grid-template-columns:1fr 1fr;}}
+  .kinds{display:grid;gap:9px;grid-template-columns:1fr;}
+  @media(min-width:560px){.kinds{grid-template-columns:repeat(3,1fr);}}
+  .kind{display:flex;align-items:center;gap:9px;border:1px solid var(--line-2);border-radius:12px;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;}
+  .kind input{width:18px;height:18px;min-height:0;accent-color:var(--navy);}
+  .kind.on{border-color:var(--sun-deep);background:var(--sun-tint);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;width:100%;
+    background:var(--sun);color:var(--navy);border:0;border-radius:999px;font-size:15.5px;font-weight:700;}
+  .btn:hover{background:var(--sun-deep);}
+  .btn[disabled]{opacity:.6;cursor:default;}
+  .note{font-size:12.5px;color:var(--ink-2);margin-top:12px;}
+  .msg{border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:16px;}
+  .msg.bad{background:var(--stop-tint);color:var(--stop);border:1px solid #F0D3CD;}
+  .done{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:26px;text-align:center;margin-bottom:40px;}
+  .done .tick{width:52px;height:52px;border-radius:50%;background:var(--trust-tint);color:var(--trust);display:grid;place-items:center;margin:0 auto 14px;font-size:24px;}
+  .done h2{font-size:19px;color:var(--navy);}
+  .done p{color:var(--ink-2);margin-top:9px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="/" aria-label="SolarDirectory South Africa — home">
+      <picture>
+        <source type="image/avif" srcset="assets/logo.avif">
+        <source type="image/webp" srcset="assets/logo.webp">
+        <img class="brand-logo" src="assets/logo.png" width="432" height="120" alt="SolarDirectory South Africa">
+      </picture>
+    </a>
+    <a class="back" href="/">← Back to the directory</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="head">
+    <h1>List your solar business</h1>
+    <p class="lede">The directory is built from the public PV GreenCard certified installer register. If you are certified and not here, or your details are wrong, tell us and we will sort it out. Listing is free.</p>
+  </div>
+
+  <div id="formWrap">
+    <div class="msg bad" id="err" hidden></div>
+    <form id="form" onsubmit="submitForm(event)">
+      <fieldset>
+        <legend>What do you need?</legend>
+        <div class="kinds" id="kinds">
+          <label class="kind on"><input type="radio" name="kind" value="new" checked> Add my business</label>
+          <label class="kind"><input type="radio" name="kind" value="claim"> Claim my listing</label>
+          <label class="kind"><input type="radio" name="kind" value="correction"> Fix a detail</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your business</legend>
+        <div class="row">
+          <label for="company">Company name <span class="req">*</span></label>
+          <input id="company" name="company" type="text" required maxlength="200" autocomplete="organization">
+        </div>
+        <div class="two">
+          <div class="row">
+            <label for="city">City or town</label>
+            <input id="city" type="text" maxlength="120">
+          </div>
+          <div class="row">
+            <label for="province">Province</label>
+            <select id="province">
+              <option value="">Choose…</option>
+              <option>Western Cape</option><option>Gauteng</option><option>KwaZulu-Natal</option>
+              <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+              <option>North West</option><option>Free State</option><option>Northern Cape</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <label for="website">Website</label>
+          <input id="website" type="text" maxlength="200" placeholder="yourcompany.co.za">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>How we reach you</legend>
+        <div class="row">
+          <label for="contact">Your name</label>
+          <input id="contact" type="text" maxlength="120" autocomplete="name">
+        </div>
+        <div class="two">
+          <div class="row">
+            <label for="email">Email <span class="req">*</span></label>
+            <input id="email" type="email" required maxlength="200" autocomplete="email">
+          </div>
+          <div class="row">
+            <label for="phone">Phone</label>
+            <input id="phone" type="text" maxlength="60" autocomplete="tel" placeholder="+27 21 000 0000">
+          </div>
+        </div>
+        <div class="row">
+          <label for="message">Anything else</label>
+          <textarea id="message" maxlength="1200" placeholder="Your PV GreenCard number, the services you offer, or what needs correcting."></textarea>
+        </div>
+      </fieldset>
+
+      <button class="btn" type="submit" id="send">Send request</button>
+      <p class="note">We check every request by hand before a listing goes up or changes, so give us a day or two. We will only use these details to contact you about your listing.</p>
+    </form>
+  </div>
+
+  <div class="done" id="done" hidden>
+    <div class="tick" aria-hidden="true">✓</div>
+    <h2>Request received</h2>
+    <p>Thank you — we will look at it by hand and come back to you by email. Nothing appears on the directory until it has been checked.</p>
+    <p style="margin-top:16px"><a class="back" href="/">← Back to the directory</a></p>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = "https://alogcohoopgzerrxheiw.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_TcktYEjqHMXgha4tYY8QVA_78xT1aM8";
+  let sb = null;
+
+  // Highlight the chosen option, since the radio itself is small on a phone.
+  document.getElementById('kinds').addEventListener('change', () => {
+    document.querySelectorAll('.kind').forEach(k =>
+      k.classList.toggle('on', k.querySelector('input').checked));
+  });
+
+  const v = id => (document.getElementById(id).value || '').trim();
+
+  async function submitForm(e){
+    e.preventDefault();
+    const btn = document.getElementById('send');
+    const err = document.getElementById('err');
+    err.hidden = true;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try{
+      if(!sb) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { error } = await sb.from('listing_requests').insert({
+        kind: document.querySelector('input[name=kind]:checked').value,
+        company_name: v('company'),
+        contact_name: v('contact') || null,
+        email: v('email'),
+        phone: v('phone') || null,
+        website: v('website') || null,
+        province: v('province') || null,
+        city: v('city') || null,
+        message: v('message') || null
+      });
+      if(error) throw error;
+      document.getElementById('formWrap').hidden = true;
+      document.getElementById('done').hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }catch(ex){
+      console.error(ex);
+      err.textContent = 'That did not send. Please try again, or email hello@solardirectorysa.co.za.';
+      err.hidden = false;
+      btn.disabled = false;
+      btn.textContent = 'Send request';
+    }
+  }
+</script>
+</body>
+</html>

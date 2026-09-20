@@ -222,3 +222,98 @@ with (security_invoker = off) as
   group by installer_id;
 
 grant select on installer_ratings to anon, authenticated;
+
+-- ------------------------------------------------- listing requests ----
+-- A business asking to be listed, or claiming a listing that already exists.
+-- Anyone may submit; only the owner can read or act on them.
+create table if not exists listing_requests (
+  id            uuid primary key default gen_random_uuid(),
+  kind          text not null default 'new' check (kind in ('new','claim','correction')),
+  installer_id  uuid references installers(id) on delete set null,
+  company_name  text not null,
+  contact_name  text,
+  email         text not null,
+  phone         text,
+  website       text,
+  province      text,
+  city          text,
+  message       text,
+  status        text not null default 'pending' check (status in ('pending','approved','rejected')),
+  admin_note    text,
+  created_at    timestamptz not null default now(),
+  reviewed_at   timestamptz
+);
+create index if not exists listing_requests_status_idx on listing_requests (status, created_at desc);
+alter table listing_requests enable row level security;
+
+-- No anon SELECT policy at all: a submitted request cannot be read back by
+-- the public, only inserted.
+create policy "Public submit listing request"
+  on listing_requests for insert to anon
+  with check (length(company_name) between 2 and 200 and length(email) between 5 and 200);
+create policy "Owner reads listing requests"
+  on listing_requests for select to authenticated using (true);
+create policy "Owner updates listing requests"
+  on listing_requests for update to authenticated using (true) with check (true);
+create policy "Owner deletes listing requests"
+  on listing_requests for delete to authenticated using (true);
+
+-- --------------------------------------------------- announcements ----
+create table if not exists announcements (
+  id         uuid primary key default gen_random_uuid(),
+  body       text not null,
+  link_url   text,
+  link_label text,
+  tone       text not null default 'info' check (tone in ('info','alert')),
+  active     boolean not null default true,
+  starts_at  timestamptz not null default now(),
+  ends_at    timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table announcements enable row level security;
+
+-- The live window is enforced in the policy, so an expired announcement
+-- cannot be fetched at all rather than being filtered in the page.
+create policy "Public read live announcements"
+  on announcements for select to anon
+  using (active and starts_at <= now() and (ends_at is null or ends_at > now()));
+create policy "Owner manages announcements"
+  on announcements for all to authenticated using (true) with check (true);
+
+-- ------------------------------------------- review text + moderation ----
+alter table reviews add column if not exists comment text;
+alter table reviews add column if not exists status text not null default 'visible'
+  check (status in ('visible','hidden'));
+alter table reviews add column if not exists hidden_reason text;
+
+drop policy if exists "Public insert rating" on reviews;
+create policy "Public insert rating"
+  on reviews for insert to anon
+  with check (
+    rating between 1 and 5
+    and length(voter_key) between 8 and 64
+    and (comment is null or length(comment) <= 600)
+    and status = 'visible'
+  );
+
+-- Hiding a review takes its score out of the average as well as its text off
+-- the listing.
+create or replace view installer_ratings
+with (security_invoker = off) as
+  select installer_id,
+         round(avg(rating)::numeric, 1) as rating_avg,
+         count(*)                       as rating_count
+  from reviews
+  where status = 'visible'
+  group by installer_id;
+grant select on installer_ratings to anon, authenticated;
+
+-- Public comment feed: the text and the score, never the voter key.
+create or replace view installer_comments
+with (security_invoker = off) as
+  select id, installer_id, rating, comment, created_at
+  from reviews
+  where status = 'visible'
+    and comment is not null
+    and length(btrim(comment)) > 0;
+grant select on installer_comments to anon, authenticated;

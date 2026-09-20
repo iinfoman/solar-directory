@@ -3,469 +3,776 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>SolarDirectory Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230E2A47'/><circle cx='16' cy='12' r='5' fill='%23F5B324'/><path d='M6 26l4-8h12l4 8z' fill='%231B4B7A'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0a0e1a; --card:#131a2b; --card-2:#161e33; --border:#232c42;
-    --orange:#f5a623; --orange-2:#f7931e; --green:#22c55e; --red:#ef4444;
-    --text:#f5f7fa; --text-dim:#9aa4bb; --text-faint:#6b7590;
+    --navy:#0E2A47; --navy-2:#1B4B7A; --navy-3:#16395E;
+    --sun:#F5B324; --sun-deep:#DF9C09; --sun-tint:#FEF4DE;
+    --sky:#EAF3FB; --sky-2:#F5F9FD;
+    --paper:#FFFFFF; --ink:#12212F; --ink-2:#5A6B7D; --ink-3:#8B99A8;
+    --line:#E2E9F0; --line-2:#CFDAE5;
+    --trust:#0F6B4F; --trust-tint:#E7F2EC;
+    --warn:#96591B; --warn-tint:#FBF3E6;
+    --stop:#A3301F; --stop-tint:#FBEDEA;
+    --r:14px;
+    --shadow:0 1px 2px rgba(14,42,71,.04), 0 8px 24px rgba(14,42,71,.07);
   }
-  *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,-apple-system,sans-serif;}
-  html,body{max-width:100vw;overflow-x:hidden;}
-  body{background:var(--bg);color:var(--text);padding:0 0 60px;}
-  .wrap{max-width:900px;margin:0 auto;padding:0 18px;}
-  header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
-  header b{font-size:16px;font-weight:800;}
-  .head-actions{display:flex;gap:8px;flex-wrap:wrap;}
-  .btn{padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--card-2);color:var(--text);cursor:pointer;}
-  .btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-2));color:#1a1206;border:none;}
-  .btn-danger{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:var(--red);}
-  input,select,textarea{width:100%;background:var(--card-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13.5px;margin-top:5px;font-family:inherit;}
-  input[type=file]{padding:8px;}
-  label{font-size:11.5px;color:var(--text-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
-  .field{margin-bottom:14px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:5px;}
-  .toggle-row span{font-size:13px;}
-  .switch{position:relative;width:38px;height:22px;flex-shrink:0;}
-  .switch input{opacity:0;width:0;height:0;}
-  .slider{position:absolute;inset:0;background:#2a3450;border-radius:999px;cursor:pointer;transition:.15s;}
-  .slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
-  input:checked + .slider{background:var(--green);}
-  input:checked + .slider:before{transform:translateX(16px);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--sky-2);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.dsp{font-family:'Poppins','Inter',sans-serif;letter-spacing:-.02em;}
+  a{color:inherit;}
+  button{font:inherit;color:inherit;cursor:pointer;}
+  :focus-visible{outline:2px solid var(--navy-2);outline-offset:2px;border-radius:4px;}
+  .hide{display:none !important;}
 
-  #login{max-width:340px;margin:80px auto;padding:26px;background:var(--card);border:1px solid var(--border);border-radius:16px;}
-  #login h2{margin-bottom:16px;font-size:18px;}
-  #login .btn-primary{width:100%;margin-top:14px;}
-  .err{color:var(--red);font-size:12.5px;margin-top:8px;}
-
-  #app{display:none;}
-  .tabs{display:flex;gap:8px;margin:20px 0 6px;}
-  .tab{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;background:var(--card-2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;}
-  .tab.active{background:var(--orange);color:#1a1206;border-color:var(--orange);}
+  /* ---------- shell ---------- */
+  .top{position:sticky;top:0;z-index:40;background:var(--navy);color:#fff;}
+  .top-in{max-width:1240px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .top b{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;}
+  .top b span{color:var(--sun);}
+  .top .who{font-size:12.5px;color:#9FB6CC;}
+  .tabs{background:var(--navy-3);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .tabs-in{max-width:1240px;margin:0 auto;padding:0 18px;display:flex;gap:2px;min-width:max-content;}
+  .tab{appearance:none;background:none;border:0;padding:12px 14px;font-size:13.5px;font-weight:600;color:#A9C0D6;border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:7px;}
+  .tab:hover{color:#fff;}
+  .tab.on{color:#fff;border-bottom-color:var(--sun);}
+  .pip{min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--sun);color:var(--navy);font-size:11px;font-weight:800;display:grid;place-items:center;}
+  .pip.zero{background:rgba(255,255,255,.16);color:#A9C0D6;}
+  main{max-width:1240px;margin:0 auto;padding:20px 18px 70px;}
   .panel{display:none;}
-  .panel.active{display:block;}
+  .panel.on{display:block;}
+  .panel > h2{font-size:19px;font-weight:700;color:var(--navy);}
+  .panel > p.lede{color:var(--ink-2);margin-top:5px;max-width:70ch;}
 
-  .toolbar{display:flex;justify-content:space-between;align-items:center;margin:16px 0;flex-wrap:wrap;gap:10px;}
-  .table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:12px;}
-  table{width:100%;min-width:640px;border-collapse:collapse;background:var(--card);font-size:13px;}
-  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
-  th{color:var(--text-faint);font-size:11px;text-transform:uppercase;letter-spacing:0.4px;}
-  tr:last-child td{border-bottom:none;}
-  .pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block;}
-  .pill-yes{background:rgba(34,197,94,0.12);color:var(--green);}
-  .pill-no{background:rgba(154,164,187,0.12);color:var(--text-dim);}
-  .pill-gold{background:rgba(245,166,35,0.15);color:var(--orange);}
-  .actions{display:flex;gap:6px;}
-  .actions .btn{padding:6px 10px;font-size:12px;}
+  /* ---------- pieces ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;border:1px solid transparent;transition:background .15s,border-color .15s;}
+  .btn-sun{background:var(--sun);color:var(--navy);} .btn-sun:hover{background:var(--sun-deep);}
+  .btn-navy{background:var(--navy);color:#fff;} .btn-navy:hover{background:var(--navy-2);}
+  .btn-ghost{background:var(--paper);border-color:var(--line-2);color:var(--navy);} .btn-ghost:hover{border-color:var(--ink-3);}
+  .btn-stop{background:var(--stop-tint);color:var(--stop);border-color:#F0D3CD;}
+  .btn-sm{min-height:34px;padding:0 12px;font-size:12.5px;}
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(5,7,14,0.8);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:22px;}
-  .modal h3{margin-bottom:16px;font-size:16px;}
-  .modal-actions{display:flex;gap:10px;margin-top:18px;}
-  .stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;flex:1;min-width:120px;}
-  .stat-card b{display:block;font-size:22px;font-weight:800;}
-  .stat-card span{font-size:11px;color:var(--text-faint);text-transform:uppercase;}
-  .hint{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
+  .cards{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px;}
+  @media(min-width:760px){.cards{grid-template-columns:repeat(4,minmax(0,1fr));}}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);}
+  .stat b{display:block;font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:var(--navy);line-height:1.1;font-variant-numeric:tabular-nums;}
+  .stat span{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px;}
+  .stat.attn{border-color:#F0DFB4;background:var(--sun-tint);}
+  .stat.attn b{color:var(--sun-deep);}
+
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-top:16px;overflow:hidden;}
+  .box-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid var(--line);}
+  .box-head h3{font-size:15px;font-weight:700;color:var(--navy);}
+  .box-body{padding:16px;}
+
+  .row{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .row:last-child{border-bottom:0;}
+  .row-main{flex:1;min-width:200px;}
+  .row-main b{font-family:'Poppins',sans-serif;font-size:14.5px;font-weight:700;color:var(--navy);display:block;}
+  .row-main .meta{font-size:12.5px;color:var(--ink-2);margin-top:2px;}
+  .row-main .msg{font-size:13px;color:var(--ink);margin-top:7px;background:var(--sky-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;white-space:pre-wrap;}
+  .row-acts{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;}
+  .chip-wait{background:var(--sun-tint);color:var(--sun-deep);}
+  .chip-ok{background:var(--trust-tint);color:var(--trust);}
+  .chip-no{background:var(--stop-tint);color:var(--stop);}
+  .chip-off{background:var(--sky);color:var(--ink-2);}
+
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:5px;}
+  input[type=text],input[type=email],input[type=url],input[type=number],input[type=password],input[type=datetime-local],select,textarea{
+    width:100%;min-height:42px;background:var(--paper);border:1px solid var(--line-2);border-radius:10px;
+    font-family:inherit;font-size:14px;color:var(--ink);padding:9px 12px;}
+  textarea{min-height:88px;resize:vertical;}
+  .grid2{display:grid;gap:12px;grid-template-columns:1fr;}
+  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr;}}
+  .field-row{margin-bottom:12px;}
+  .check{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:10px;}
+  .check input{width:18px;height:18px;accent-color:var(--navy);}
+
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  .toolbar input[type=text]{max-width:320px;}
+  .seg{display:inline-flex;background:var(--sky);border:1px solid var(--line);border-radius:999px;padding:3px;}
+  .seg button{border:0;background:none;padding:6px 13px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink-2);}
+  .seg button.on{background:var(--navy);color:#fff;}
+
+  .empty{padding:34px 16px;text-align:center;color:var(--ink-2);font-size:13.5px;}
+  .note{font-size:12.5px;color:var(--ink-2);}
+
+  /* ---------- login ---------- */
+  .login-wrap{min-height:80vh;display:grid;place-items:center;padding:20px;}
+  .login{width:100%;max-width:370px;background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;}
+  .login h1{font-size:19px;color:var(--navy);}
+  .login p{font-size:13px;color:var(--ink-2);margin-top:5px;}
+  .err{background:var(--stop-tint);color:var(--stop);border:1px solid #F0D3CD;border-radius:10px;padding:9px 11px;font-size:13px;margin-top:12px;}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(14,33,47,.55);display:none;align-items:flex-start;justify-content:center;z-index:90;padding:16px;overflow-y:auto;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--paper);border-radius:16px;width:100%;max-width:620px;margin:24px 0;box-shadow:0 24px 70px rgba(14,42,71,.3);}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);}
+  .modal-head h3{font-size:16px;font-weight:700;color:var(--navy);}
+  .modal-body{padding:18px;}
+  .modal-foot{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;padding:14px 18px;border-top:1px solid var(--line);background:var(--sky-2);border-radius:0 0 16px 16px;}
+  .x{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:14px;color:var(--ink-2);}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;
+    padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:600;box-shadow:0 12px 34px rgba(14,42,71,.34);z-index:120;display:none;}
+  .toast.show{display:block;}
 </style>
 </head>
 <body>
 
-<div id="login">
-  <h2>☀️ SolarDirectory Admin</h2>
-  <div class="field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
-  <div class="field"><label>Password</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-  <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Sign In</button>
-  <div class="err" id="loginErr"></div>
-  <p style="margin-top:10px;font-size:12px;text-align:center;"><a href="index.html" style="color:var(--text-dim);">← Back to main site</a></p>
+<!-- ============================ login ============================ -->
+<div class="login-wrap" id="loginView">
+  <div class="login">
+    <h1>SolarDirectory Admin</h1>
+    <p>Sign in to manage listings, requests and adverts.</p>
+    <div style="margin-top:16px">
+      <div class="field-row">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username">
+      </div>
+      <div class="field-row">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password">
+      </div>
+      <button class="btn btn-navy" style="width:100%" onclick="doLogin()">Sign in</button>
+      <div id="loginErr" class="err hide"></div>
+    </div>
+  </div>
 </div>
 
-<div id="app">
-  <header>
-    <b>☀️ SolarDirectory Admin</b>
-    <div class="head-actions">
-      <a href="index.html" class="btn">← View Site</a>
-      <button class="btn" onclick="doLogout()">Sign Out</button>
+<!-- ============================ app ============================ -->
+<div id="appView" class="hide">
+  <div class="top">
+    <div class="top-in">
+      <b>Solar<span>Directory</span> Admin</b>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="who" id="whoami"></span>
+        <button class="btn btn-sm btn-ghost" onclick="doLogout()">Sign out</button>
+      </div>
     </div>
-  </header>
-  <div class="wrap">
-    <div class="stat-row" id="stats"></div>
+  </div>
 
-    <div class="tabs">
-      <div class="tab active" data-tab="installers" onclick="switchTab('installers')">Installers</div>
-      <div class="tab" data-tab="ads" onclick="switchTab('ads')">Adverts</div>
+  <nav class="tabs">
+    <div class="tabs-in" id="tabbar">
+      <button class="tab on" data-p="overview" onclick="go('overview')">Overview</button>
+      <button class="tab" data-p="requests" onclick="go('requests')">Requests <span class="pip zero" id="pipReq">0</span></button>
+      <button class="tab" data-p="installers" onclick="go('installers')">Installers</button>
+      <button class="tab" data-p="featured" onclick="go('featured')">Featured</button>
+      <button class="tab" data-p="ads" onclick="go('ads')">Adverts</button>
+      <button class="tab" data-p="news" onclick="go('news')">Announcements</button>
+      <button class="tab" data-p="reviews" onclick="go('reviews')">Reviews <span class="pip zero" id="pipRev">0</span></button>
     </div>
+  </nav>
 
-    <div class="panel active" id="panel-installers">
+  <main>
+    <!-- ---------------- overview ---------------- -->
+    <section class="panel on" id="p-overview">
+      <h2>Overview</h2>
+      <p class="lede">Where the directory stands right now.</p>
+      <div class="cards" id="statCards"></div>
+      <div class="box">
+        <div class="box-head"><h3>Needs you</h3></div>
+        <div id="todoList"></div>
+      </div>
+    </section>
+
+    <!-- ---------------- requests ---------------- -->
+    <section class="panel" id="p-requests">
+      <h2>Listing requests</h2>
+      <p class="lede">Businesses asking to be listed, or claiming a listing that is already here. Approving a new request creates the listing; approving a claim updates the existing one.</p>
       <div class="toolbar">
-        <input id="search" style="max-width:260px;" placeholder="Filter by name/province..." oninput="renderTable()">
-        <button class="btn btn-primary" onclick="openEdit(null)">+ Add Installer</button>
+        <div class="seg" id="reqSeg">
+          <button class="on" onclick="setReqFilter('pending')">Pending</button>
+          <button onclick="setReqFilter('approved')">Approved</button>
+          <button onclick="setReqFilter('rejected')">Rejected</button>
+          <button onclick="setReqFilter('all')">All</button>
+        </div>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Name</th><th>Province</th><th>Yrs</th><th>Rank</th><th>Active</th><th>Verified</th><th></th></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
+      <div class="box" id="reqBox"></div>
+    </section>
 
-    <div class="panel" id="panel-ads">
-      <div class="toggle-row" style="margin-bottom:16px;">
-        <span><b>Advertising section</b> — shown on the public homepage</span>
-        <label class="switch"><input type="checkbox" id="adsEnabledToggle" onchange="toggleAdsEnabled()"><span class="slider"></span></label>
-      </div>
+    <!-- ---------------- installers ---------------- -->
+    <section class="panel" id="p-installers">
+      <h2>Installers</h2>
+      <p class="lede">Every listing in the directory. A listing with no website, phone or email is hidden from the public site until one is added.</p>
       <div class="toolbar">
-        <span class="hint">Ads rotate automatically on the public site every few seconds.</span>
-        <button class="btn btn-primary" onclick="openAdEdit(null)">+ Add Advert</button>
+        <input type="text" id="instSearch" placeholder="Search name, city or province" oninput="renderInstallers()">
+        <div class="seg">
+          <button class="on" id="segAll" onclick="setInstFilter('all')">All</button>
+          <button id="segNo" onclick="setInstFilter('nocontact')">No contact</button>
+          <button id="segOff" onclick="setInstFilter('inactive')">Hidden</button>
+        </div>
+        <button class="btn btn-sun btn-sm" onclick="openInstaller(null)">+ Add installer</button>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Title</th><th>Discount</th><th>Linked Installer</th><th>Active</th><th></th></tr></thead>
-          <tbody id="adsTbody"></tbody>
-        </table>
+      <div class="box" id="instBox"></div>
+    </section>
+
+    <!-- ---------------- featured ---------------- -->
+    <section class="panel" id="p-featured">
+      <h2>Featured placement</h2>
+      <p class="lede">One installer can hold the national top spot. Any number can be pinned to the top of their own province. Everything else sorts alphabetically.</p>
+      <div class="box">
+        <div class="box-head">
+          <h3>National top spot</h3>
+          <span class="note">Shown first everywhere</span>
+        </div>
+        <div class="box-body" id="natBox"></div>
       </div>
-    </div>
-  </div>
+      <div class="box" id="provBox"></div>
+    </section>
+
+    <!-- ---------------- adverts ---------------- -->
+    <section class="panel" id="p-ads">
+      <h2>Adverts</h2>
+      <p class="lede">Paid placements shown in a strip on the public homepage. Turn the whole strip off without deleting anything.</p>
+      <div class="box">
+        <div class="box-head">
+          <h3>Advert strip</h3>
+          <label class="check" style="margin:0">
+            <input type="checkbox" id="adsOn" onchange="toggleAds()"> Visible on the homepage
+          </label>
+        </div>
+      </div>
+      <div class="toolbar"><button class="btn btn-sun btn-sm" onclick="openAd(null)">+ New advert</button></div>
+      <div class="box" id="adsBox"></div>
+    </section>
+
+    <!-- ---------------- announcements ---------------- -->
+    <section class="panel" id="p-news">
+      <h2>Announcements</h2>
+      <p class="lede">A single line across the top of the public site. Useful for load-shedding notices, new province coverage, or a deadline. Only one shows at a time — the newest live one.</p>
+      <div class="toolbar"><button class="btn btn-sun btn-sm" onclick="openNews(null)">+ New announcement</button></div>
+      <div class="box" id="newsBox"></div>
+    </section>
+
+    <!-- ---------------- reviews ---------------- -->
+    <section class="panel" id="p-reviews">
+      <h2>Reviews</h2>
+      <p class="lede">Ratings left by visitors. Hiding one removes its comment from the listing and takes its score out of the average. Nothing is deleted unless you delete it.</p>
+      <div class="toolbar">
+        <div class="seg">
+          <button class="on" id="revWith" onclick="setRevFilter('comments')">With comments</button>
+          <button id="revAll" onclick="setRevFilter('all')">All</button>
+          <button id="revHidden" onclick="setRevFilter('hidden')">Hidden</button>
+        </div>
+      </div>
+      <div class="box" id="revBox"></div>
+    </section>
+  </main>
 </div>
 
-<!-- Installer edit modal -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h3 id="modalTitle">Add Installer</h3>
-    <input type="hidden" id="f_id">
-    <div class="field"><label>Name</label><input id="f_name"></div>
-    <div class="row2">
-      <div class="field"><label>City</label><input id="f_city"></div>
-      <div class="field"><label>Province</label>
-        <select id="f_province">
-          <option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option>
-          <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
-          <option>North West</option><option>Free State</option><option>Northern Cape</option>
-        </select>
-      </div>
-    </div>
-    <div class="field"><label>Description (blurb)</label><textarea id="f_blurb" rows="3"></textarea></div>
-    <div class="field"><label>Services (comma-separated)</label><input id="f_services" placeholder="Commercial Rooftop, Battery Storage"></div>
-    <div class="row2">
-      <div class="field"><label>Years in Business</label><input id="f_years" type="number"></div>
-      <div class="field"><label>Verified</label>
-        <select id="f_verified"><option value="true">Yes</option><option value="false">No</option></select>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Min System Size (kW)</label><input id="f_minkw" type="number"></div>
-      <div class="field"><label>Max System Size (kW)</label><input id="f_maxkw" type="number"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Phone</label><input id="f_phone" placeholder="+27..."></div>
-      <div class="field"><label>Email</label><input id="f_email" type="email"></div>
-    </div>
-    <div class="field"><label>Website</label><input id="f_website" placeholder="example.co.za"></div>
-    <div class="field"><label>Logo (optional)</label><input id="f_logo_file" type="file" accept="image/*"><div class="hint" id="f_logo_hint"></div></div>
-
-    <div class="field" style="margin-top:18px;">
-      <label>Ranking &amp; Visibility</label>
-      <div class="toggle-row">
-        <span>Active (visible on public site)</span>
-        <label class="switch"><input type="checkbox" id="f_active"><span class="slider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <span>★ Feature at top of this installer's province</span>
-        <label class="switch"><input type="checkbox" id="f_feat_province"><span class="slider"></span></label>
-      </div>
-      <div class="toggle-row">
-        <span>★ #1 Nationally (only one installer can hold this)</span>
-        <label class="switch"><input type="checkbox" id="f_feat_national"><span class="slider"></span></label>
-      </div>
-      <div class="field"><label>Manual boost (higher = ranks higher when not featured)</label><input id="f_boost" type="number" value="0"></div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="saveInstaller()">Save</button>
-      <button class="btn" onclick="closeEdit()">Cancel</button>
-    </div>
-  </div>
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
 </div>
-
-<!-- Ad edit modal -->
-<div class="modal-overlay" id="adModalOverlay">
-  <div class="modal">
-    <h3 id="adModalTitle">Add Advert</h3>
-    <input type="hidden" id="a_id">
-    <div class="field"><label>Title</label><input id="a_title" placeholder="e.g. Bester Africa — Featured Installer"></div>
-    <div class="field"><label>Subtitle</label><input id="a_subtitle" placeholder="Short line shown under the title"></div>
-    <div class="row2">
-      <div class="field"><label>Discount / Promo tag (optional)</label><input id="a_discount" placeholder="e.g. 10% off in August"></div>
-      <div class="field"><label>Display order</label><input id="a_order" type="number" value="0"></div>
-    </div>
-    <div class="field"><label>Linked installer (optional)</label>
-      <select id="a_installer"><option value="">— None —</option></select>
-    </div>
-    <div class="field"><label>Custom link (optional — overrides installer website)</label><input id="a_cta" placeholder="https://..."></div>
-    <div class="field"><label>Ad image / logo (optional)</label><input id="a_image_file" type="file" accept="image/*"><div class="hint" id="a_image_hint"></div></div>
-    <div class="toggle-row">
-      <span>Active</span>
-      <label class="switch"><input type="checkbox" id="a_active" checked><span class="slider"></span></label>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="saveAd()">Save</button>
-      <button class="btn" onclick="closeAdEdit()">Cancel</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
   const SUPABASE_URL = "https://alogcohoopgzerrxheiw.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_TcktYEjqHMXgha4tYY8QVA_78xT1aM8";
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let ROWS = [], ADS = [];
 
-  // --- Output escaping -------------------------------------------------
-  // Table cells below are built with innerHTML from database values, so they
-  // must be escaped. safeUrl() rejects anything that is not http(s).
+  const PROVINCES = ['Western Cape','Gauteng','KwaZulu-Natal','Eastern Cape','Limpopo',
+                     'Mpumalanga','North West','Free State','Northern Cape'];
+
+  let REQS = [], INSTALLERS = [], ADS = [], NEWS = [], REVIEWS = [];
+  let reqFilter = 'pending', instFilter = 'all', revFilter = 'comments';
+
+  // Everything rendered below comes from the database or from a form someone
+  // on the internet filled in, so it is escaped on the way out.
   function esc(v){
-    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
   function safeUrl(u){
-    var s = String(u == null ? '' : u).trim();
-    return /^https?:\/\//i.test(s) ? esc(s) : '';
+    const s = String(u == null ? '' : u).trim();
+    if(!s) return '';
+    const withProto = /^https?:\/\//i.test(s) ? s : 'https://' + s;
+    return /^https?:\/\//i.test(withProto) ? esc(withProto) : '';
   }
+  function when(iso){
+    if(!iso) return '';
+    return new Date(iso).toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+  }
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
+  function showModal(title, body, foot){
+    document.getElementById('modal').innerHTML =
+      `<div class="modal-head"><h3>${title}</h3><button class="x" onclick="closeModal()" aria-label="Close">✕</button></div>
+       <div class="modal-body">${body}</div>
+       <div class="modal-foot">${foot}</div>`;
+    document.getElementById('overlay').classList.add('open');
+  }
+  const val = id => (document.getElementById(id).value || '').trim();
+  const checked = id => document.getElementById(id).checked;
 
+  // ------------------------------------------------------------ auth ----
   async function doLogin(){
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPass').value;
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if(error){ document.getElementById('loginErr').textContent = error.message; return; }
-    showApp();
+    const err = document.getElementById('loginErr');
+    err.classList.add('hide');
+    const { error } = await sb.auth.signInWithPassword({ email: val('email'), password: val('password') });
+    if(error){ err.textContent = error.message; err.classList.remove('hide'); return; }
+    boot();
   }
-
   async function doLogout(){ await sb.auth.signOut(); location.reload(); }
 
-  async function showApp(){
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    await Promise.all([loadRows(), loadAds(), loadSettings()]);
+  async function boot(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session) return;
+    document.getElementById('loginView').classList.add('hide');
+    document.getElementById('appView').classList.remove('hide');
+    document.getElementById('whoami').textContent = session.user.email;
+    await loadAll();
   }
 
-  async function checkSession(){
-    const { data } = await sb.auth.getSession();
-    if(data.session) showApp();
+  function go(name){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.p === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + name));
   }
 
-  function switchTab(name){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
-    document.getElementById('panel-installers').classList.toggle('active', name==='installers');
-    document.getElementById('panel-ads').classList.toggle('active', name==='ads');
+  // ------------------------------------------------------------ load ----
+  async function loadAll(){
+    const [r, i, a, n, v] = await Promise.all([
+      sb.from('listing_requests').select('*').order('created_at', { ascending:false }),
+      sb.from('installers').select('*').order('name'),
+      sb.from('ads').select('*').order('display_order'),
+      sb.from('announcements').select('*').order('created_at', { ascending:false }),
+      sb.from('reviews').select('*').order('created_at', { ascending:false })
+    ]);
+    for(const res of [r,i,a,n,v]) if(res.error) console.error(res.error);
+    REQS = r.data || []; INSTALLERS = i.data || []; ADS = a.data || [];
+    NEWS = n.data || []; REVIEWS = v.data || [];
+
+    const s = await sb.from('settings').select('*').eq('key','ads_enabled').maybeSingle();
+    document.getElementById('adsOn').checked = !!(s.data && s.data.value === 'true');
+
+    renderOverview(); renderRequests(); renderInstallers();
+    renderFeatured(); renderAds(); renderNews(); renderReviews();
   }
 
-  // ---------- Installers ----------
-  async function loadRows(){
-    const { data, error } = await sb.from('installers').select('*').order('created_at', { ascending:false });
-    if(error){ alert('Load error: '+error.message); return; }
-    ROWS = data;
-    renderStats();
-    renderTable();
-    const sel = document.getElementById('a_installer');
-    sel.innerHTML = '<option value="">— None —</option>' + ROWS.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
+  // -------------------------------------------------------- overview ----
+  function renderOverview(){
+    const pending = REQS.filter(r => r.status === 'pending').length;
+    const contactable = INSTALLERS.filter(r => r.website || r.phone || r.email).length;
+    const noContact = INSTALLERS.length - contactable;
+    const newComments = REVIEWS.filter(r => r.comment && r.status === 'visible').length;
+    const liveNews = NEWS.filter(isLive).length;
+    const liveAds = ADS.filter(a => a.active).length;
+
+    document.getElementById('pipReq').textContent = pending;
+    document.getElementById('pipReq').className = 'pip' + (pending ? '' : ' zero');
+    document.getElementById('pipRev').textContent = newComments;
+    document.getElementById('pipRev').className = 'pip' + (newComments ? '' : ' zero');
+
+    document.getElementById('statCards').innerHTML = `
+      <div class="stat${pending ? ' attn' : ''}"><b>${pending}</b><span>Requests waiting</span></div>
+      <div class="stat"><b>${contactable}</b><span>Listings live</span></div>
+      <div class="stat"><b>${noContact}</b><span>Hidden, no contact</span></div>
+      <div class="stat"><b>${REVIEWS.length}</b><span>Ratings received</span></div>`;
+
+    const todo = [];
+    if(pending) todo.push([`${pending} listing request${pending===1?'':'s'} waiting`, 'requests', 'Review']);
+    if(noContact) todo.push([`${noContact} listing${noContact===1?'':'s'} hidden for having no contact details`, 'installers', 'Fill in']);
+    if(newComments) todo.push([`${newComments} review comment${newComments===1?'':'s'} published`, 'reviews', 'Check']);
+    if(!liveNews) todo.push(['No announcement running', 'news', 'Write one']);
+    if(!liveAds) todo.push(['No adverts running', 'ads', 'Add one']);
+
+    document.getElementById('todoList').innerHTML = todo.length
+      ? todo.map(([text, tab, label]) => `
+          <div class="row">
+            <div class="row-main"><b>${esc(text)}</b></div>
+            <div class="row-acts"><button class="btn btn-sm btn-ghost" onclick="go('${tab}')">${label} →</button></div>
+          </div>`).join('')
+      : '<div class="empty">Nothing waiting. The directory is up to date.</div>';
+  }
+  const isLive = n => n.active && new Date(n.starts_at) <= new Date() &&
+                      (!n.ends_at || new Date(n.ends_at) > new Date());
+
+  // -------------------------------------------------------- requests ----
+  function setReqFilter(f){
+    reqFilter = f;
+    document.querySelectorAll('#reqSeg button').forEach((b,i) =>
+      b.classList.toggle('on', ['pending','approved','rejected','all'][i] === f));
+    renderRequests();
+  }
+  function renderRequests(){
+    const list = REQS.filter(r => reqFilter === 'all' || r.status === reqFilter);
+    document.getElementById('reqBox').innerHTML = list.length ? list.map(r => {
+      const chip = r.status === 'pending' ? '<span class="chip chip-wait">Waiting</span>'
+                 : r.status === 'approved' ? '<span class="chip chip-ok">Approved</span>'
+                 : '<span class="chip chip-no">Rejected</span>';
+      const kind = r.kind === 'claim' ? 'Claiming an existing listing'
+                 : r.kind === 'correction' ? 'Correction to a listing' : 'New listing';
+      const bits = [r.city, r.province].filter(Boolean).join(', ');
+      const contact = [r.email, r.phone, r.website].filter(Boolean).map(esc).join(' &nbsp;·&nbsp; ');
+      return `<div class="row">
+        <div class="row-main">
+          <b>${esc(r.company_name)} ${chip}</b>
+          <div class="meta">${esc(kind)}${bits ? ' &nbsp;·&nbsp; ' + esc(bits) : ''} &nbsp;·&nbsp; ${esc(when(r.created_at))}</div>
+          <div class="meta">${contact || 'No contact details supplied'}</div>
+          ${r.contact_name ? `<div class="meta">Contact: ${esc(r.contact_name)}</div>` : ''}
+          ${r.message ? `<div class="msg">${esc(r.message)}</div>` : ''}
+          ${r.admin_note ? `<div class="meta" style="margin-top:6px">Note: ${esc(r.admin_note)}</div>` : ''}
+        </div>
+        <div class="row-acts">
+          ${r.status === 'pending' ? `
+            <button class="btn btn-sm btn-sun" onclick="approveRequest('${esc(r.id)}')">Approve</button>
+            <button class="btn btn-sm btn-ghost" onclick="rejectRequest('${esc(r.id)}')">Reject</button>` : ''}
+          <button class="btn btn-sm btn-stop" onclick="deleteRow('listing_requests','${esc(r.id)}','Delete this request?')">Delete</button>
+        </div>
+      </div>`;
+    }).join('') : `<div class="empty">No ${reqFilter === 'all' ? '' : reqFilter + ' '}requests.</div>`;
   }
 
-  function renderStats(){
-    const total = ROWS.length;
-    const active = ROWS.filter(r=>r.is_active).length;
-    const provinces = new Set(ROWS.map(r=>r.province).filter(Boolean)).size;
-    const avgYears = total ? Math.round(ROWS.reduce((s,r)=>s+(r.years_in_business||0),0)/total) : 0;
-    document.getElementById('stats').innerHTML = [
-      ['Total Installers', total], ['Active on Site', active], ['Provinces', provinces], ['Avg. Years', avgYears]
-    ].map(([label,val])=>`<div class="stat-card"><b>${val}</b><span>${label}</span></div>`).join('');
+  // Approving fills the listing form with what the business sent, so nothing
+  // reaches the public site without being looked at first.
+  function approveRequest(id){
+    const r = REQS.find(x => x.id === id);
+    if(!r) return;
+    const existing = r.installer_id ? INSTALLERS.find(i => i.id === r.installer_id) : null;
+    openInstaller(existing ? existing.id : null, {
+      name: r.company_name, city: r.city || '', province: r.province || '',
+      phone: r.phone || '', email: r.email || '', website: r.website || '',
+      _requestId: id
+    });
+  }
+  async function rejectRequest(id){
+    const note = prompt('Reason for rejecting (kept internal, optional):', '');
+    if(note === null) return;
+    const { error } = await sb.from('listing_requests')
+      .update({ status:'rejected', admin_note: note || null, reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+    if(error) return toast(error.message);
+    toast('Request rejected'); await loadAll();
   }
 
-  function renderTable(){
-    const q = document.getElementById('search').value.toLowerCase();
-    const list = ROWS.filter(r => !q || (r.name+(r.province||'')).toLowerCase().includes(q));
-    document.getElementById('tbody').innerHTML = list.map(r => `
-      <tr>
-        <td>${esc(r.name)}</td>
-        <td>${esc(r.province||'—')}</td>
-        <td>${esc(r.years_in_business ?? '—')}</td>
-        <td>${r.featured_national?'<span class="pill pill-gold">#1 National</span>':(r.featured_province?'<span class="pill pill-gold">Top Province</span>':(r.sort_boost?esc('+'+r.sort_boost):'—'))}</td>
-        <td><span class="pill ${r.is_active?'pill-yes':'pill-no'}">${r.is_active?'Active':'Hidden'}</span></td>
-        <td><span class="pill ${r.verified?'pill-yes':'pill-no'}">${r.verified?'Verified':'Unverified'}</span></td>
-        <td class="actions">
-          <button class="btn" onclick="openEdit('${esc(r.id)}')">Edit</button>
-          <button class="btn btn-danger" onclick="deleteInstaller('${esc(r.id)}')">Delete</button>
-        </td>
-      </tr>
-    `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:24px;">No installers found.</td></tr>';
+  // ------------------------------------------------------ installers ----
+  function setInstFilter(f){
+    instFilter = f;
+    document.getElementById('segAll').classList.toggle('on', f === 'all');
+    document.getElementById('segNo').classList.toggle('on', f === 'nocontact');
+    document.getElementById('segOff').classList.toggle('on', f === 'inactive');
+    renderInstallers();
+  }
+  function renderInstallers(){
+    const q = (document.getElementById('instSearch').value || '').trim().toLowerCase();
+    let list = INSTALLERS.slice();
+    if(instFilter === 'nocontact') list = list.filter(r => !r.website && !r.phone && !r.email);
+    if(instFilter === 'inactive')  list = list.filter(r => r.is_active === false);
+    if(q) list = list.filter(r => [r.name, r.city, r.province].filter(Boolean).join(' ').toLowerCase().includes(q));
+
+    document.getElementById('instBox').innerHTML = list.length ? list.map(r => {
+      const reachable = r.website || r.phone || r.email;
+      const flags = [];
+      if(r.featured_national) flags.push('<span class="chip chip-wait">National top</span>');
+      if(r.featured_province) flags.push('<span class="chip chip-wait">Province top</span>');
+      if(!reachable) flags.push('<span class="chip chip-no">Hidden — no contact</span>');
+      if(r.is_active === false) flags.push('<span class="chip chip-off">Inactive</span>');
+      return `<div class="row">
+        <div class="row-main">
+          <b>${esc(r.name)}</b>
+          <div class="meta">${esc([r.city, r.province].filter(Boolean).join(', '))}</div>
+          <div class="meta">${[r.website, r.phone, r.email].filter(Boolean).map(esc).join(' &nbsp;·&nbsp; ') || '—'}</div>
+          ${flags.length ? `<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap">${flags.join('')}</div>` : ''}
+        </div>
+        <div class="row-acts">
+          <button class="btn btn-sm btn-ghost" onclick="openInstaller('${esc(r.id)}')">Edit</button>
+          <button class="btn btn-sm btn-stop" onclick="deleteRow('installers','${esc(r.id)}','Delete ${esc(r.name).replace(/'/g,'')}? This cannot be undone.')">Delete</button>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty">No installers match.</div>';
   }
 
-  function openEdit(id){
-    const r = id ? ROWS.find(x=>x.id===id) : null;
-    document.getElementById('modalTitle').textContent = r ? 'Edit Installer' : 'Add Installer';
-    document.getElementById('f_id').value = r ? r.id : '';
-    document.getElementById('f_name').value = r ? r.name : '';
-    document.getElementById('f_city').value = r ? (r.city||'') : '';
-    document.getElementById('f_province').value = r ? (r.province||'Gauteng') : 'Gauteng';
-    document.getElementById('f_blurb').value = r ? (r.blurb||'') : '';
-    document.getElementById('f_services').value = r ? (r.services||[]).join(', ') : '';
-    document.getElementById('f_years').value = r ? (r.years_in_business ?? '') : '';
-    document.getElementById('f_verified').value = r ? String(r.verified) : 'false';
-    document.getElementById('f_minkw').value = r ? (r.min_system_size_kw ?? '') : '';
-    document.getElementById('f_maxkw').value = r ? (r.max_system_size_kw ?? '') : '';
-    document.getElementById('f_phone').value = r ? (r.phone||'') : '';
-    document.getElementById('f_email').value = r ? (r.email||'') : '';
-    document.getElementById('f_website').value = r ? (r.website||'') : '';
-    document.getElementById('f_logo_file').value = '';
-    document.getElementById('f_logo_hint').textContent = r && r.logo_url ? 'Current logo is set — choose a file to replace it.' : '';
-    document.getElementById('f_active').checked = r ? !!r.is_active : true;
-    document.getElementById('f_feat_province').checked = r ? !!r.featured_province : false;
-    document.getElementById('f_feat_national').checked = r ? !!r.featured_national : false;
-    document.getElementById('f_boost').value = r ? (r.sort_boost ?? 0) : 0;
-    document.getElementById('modalOverlay').classList.add('open');
-  }
-  function closeEdit(){ document.getElementById('modalOverlay').classList.remove('open'); }
-
-  async function uploadFile(fileInput, prefix){
-    const file = fileInput.files[0];
-    if(!file) return null;
-    const path = `${prefix}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_')}`;
-    const { error } = await sb.storage.from('directory-assets').upload(path, file, { upsert:true });
-    if(error){ alert('Image upload failed: '+error.message); return null; }
-    const { data } = sb.storage.from('directory-assets').getPublicUrl(path);
-    return data.publicUrl;
+  function openInstaller(id, prefill){
+    const r = id ? INSTALLERS.find(x => x.id === id) : null;
+    const d = Object.assign({
+      name:'', city:'', province:'', blurb:'', services:[], website:'', phone:'', email:'',
+      verified:true, is_active:true, featured_national:false, featured_province:false, sort_boost:0
+    }, r || {}, prefill || {});
+    const opts = PROVINCES.map(p => `<option${d.province === p ? ' selected' : ''}>${esc(p)}</option>`).join('');
+    showModal(id ? 'Edit listing' : 'New listing', `
+      <input type="hidden" id="f_id" value="${esc(id || '')}">
+      <input type="hidden" id="f_req" value="${esc((prefill && prefill._requestId) || '')}">
+      <div class="field-row"><label for="f_name">Company name</label><input id="f_name" type="text" value="${esc(d.name)}"></div>
+      <div class="grid2">
+        <div class="field-row"><label for="f_city">City</label><input id="f_city" type="text" value="${esc(d.city)}"></div>
+        <div class="field-row"><label for="f_prov">Province</label><select id="f_prov"><option value="">Choose…</option>${opts}</select></div>
+      </div>
+      <div class="grid2">
+        <div class="field-row"><label for="f_site">Website</label><input id="f_site" type="text" value="${esc(d.website || '')}" placeholder="example.co.za"></div>
+        <div class="field-row"><label for="f_phone">Phone</label><input id="f_phone" type="text" value="${esc(d.phone || '')}" placeholder="+27 21 000 0000"></div>
+      </div>
+      <div class="field-row"><label for="f_email">Email</label><input id="f_email" type="email" value="${esc(d.email || '')}"></div>
+      <div class="field-row"><label for="f_serv">Services (comma separated)</label><input id="f_serv" type="text" value="${esc((d.services || []).join(', '))}"></div>
+      <div class="field-row"><label for="f_blurb">Description</label><textarea id="f_blurb">${esc(d.blurb || '')}</textarea></div>
+      <label class="check"><input type="checkbox" id="f_verified" ${d.verified ? 'checked' : ''}> PV GreenCard listed</label>
+      <label class="check"><input type="checkbox" id="f_active" ${d.is_active !== false ? 'checked' : ''}> Active</label>
+      <p class="note">A listing with no website, phone or email stays hidden from the public site whatever these say.</p>
+    `, `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-navy" onclick="saveInstaller()">${id ? 'Save changes' : 'Create listing'}</button>`);
   }
 
   async function saveInstaller(){
-    const id = document.getElementById('f_id').value;
-    const wantsNational = document.getElementById('f_feat_national').checked;
-    const logoUrl = await uploadFile(document.getElementById('f_logo_file'), 'logos');
+    const id = val('f_id'), reqId = val('f_req');
     const payload = {
-      name: document.getElementById('f_name').value.trim(),
-      city: document.getElementById('f_city').value.trim(),
-      province: document.getElementById('f_province').value,
-      blurb: document.getElementById('f_blurb').value.trim(),
-      services: document.getElementById('f_services').value.split(',').map(s=>s.trim()).filter(Boolean),
-      years_in_business: document.getElementById('f_years').value ? Number(document.getElementById('f_years').value) : null,
-      verified: document.getElementById('f_verified').value === 'true',
-      min_system_size_kw: document.getElementById('f_minkw').value ? Number(document.getElementById('f_minkw').value) : null,
-      max_system_size_kw: document.getElementById('f_maxkw').value ? Number(document.getElementById('f_maxkw').value) : null,
-      phone: document.getElementById('f_phone').value.trim(),
-      email: document.getElementById('f_email').value.trim(),
-      website: document.getElementById('f_website').value.trim(),
-      is_active: document.getElementById('f_active').checked,
-      featured_province: document.getElementById('f_feat_province').checked,
-      sort_boost: Number(document.getElementById('f_boost').value || 0)
+      name: val('f_name'), city: val('f_city'), province: val('f_prov'),
+      blurb: val('f_blurb') || null,
+      services: val('f_serv') ? val('f_serv').split(',').map(s => s.trim()).filter(Boolean) : [],
+      website: val('f_site') || null, phone: val('f_phone') || null, email: val('f_email') || null,
+      verified: checked('f_verified'), is_active: checked('f_active')
     };
-    if(logoUrl) payload.logo_url = logoUrl;
-    if(!payload.name){ alert('Name is required'); return; }
+    if(!payload.name || !payload.city || !payload.province) return toast('Name, city and province are required');
 
-    // If claiming the national spot, clear it from everyone else first (DB also enforces this with a unique index)
-    if(wantsNational){
-      await sb.from('installers').update({ featured_national:false }).eq('featured_national', true);
+    const { error } = id
+      ? await sb.from('installers').update(payload).eq('id', id)
+      : await sb.from('installers').insert(payload);
+    if(error) return toast(error.message);
+
+    if(reqId){
+      await sb.from('listing_requests')
+        .update({ status:'approved', reviewed_at: new Date().toISOString() }).eq('id', reqId);
     }
-    payload.featured_national = wantsNational;
-
-    let error;
-    if(id){ ({ error } = await sb.from('installers').update(payload).eq('id', id)); }
-    else { ({ error } = await sb.from('installers').insert(payload)); }
-    if(error){ alert('Save error: '+error.message); return; }
-    closeEdit();
-    await loadRows();
+    closeModal(); toast(id ? 'Listing saved' : 'Listing created'); await loadAll();
   }
 
-  async function deleteInstaller(id){
-    if(!confirm('Delete this installer? This cannot be undone — consider using "Active" toggle to just hide it instead.')) return;
-    const { error } = await sb.from('installers').delete().eq('id', id);
-    if(error){ alert('Delete error: '+error.message); return; }
-    await loadRows();
+  // -------------------------------------------------------- featured ----
+  function renderFeatured(){
+    const nat = INSTALLERS.find(r => r.featured_national);
+    document.getElementById('natBox').innerHTML = nat
+      ? `<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+           <div><b style="font-family:'Poppins',sans-serif;color:var(--navy)">${esc(nat.name)}</b>
+             <div class="meta">${esc([nat.city, nat.province].filter(Boolean).join(', '))}</div></div>
+           <button class="btn btn-sm btn-ghost" onclick="setNational(null)">Clear</button>
+         </div>`
+      : `<p class="note" style="margin-bottom:10px">Nobody holds the national spot.</p>
+         <select id="natPick" onchange="setNational(this.value)">
+           <option value="">Choose an installer…</option>
+           ${INSTALLERS.filter(r => r.website || r.phone || r.email)
+             .map(r => `<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.province)}</option>`).join('')}
+         </select>`;
+
+    const byProv = {};
+    INSTALLERS.forEach(r => { (byProv[r.province] = byProv[r.province] || []).push(r); });
+    const provinces = Object.keys(byProv).sort();
+    document.getElementById('provBox').innerHTML =
+      `<div class="box-head"><h3>Pinned by province</h3><span class="note">Shown first within their province</span></div>` +
+      (provinces.length ? provinces.map(prov => {
+        const rows = byProv[prov].filter(r => r.website || r.phone || r.email);
+        const pinned = rows.filter(r => r.featured_province);
+        return `<div class="row">
+          <div class="row-main">
+            <b>${esc(prov)}</b>
+            <div class="meta">${rows.length} listing${rows.length === 1 ? '' : 's'} ·
+              ${pinned.length ? esc(pinned.map(p => p.name).join(', ')) : 'none pinned'}</div>
+            <div style="margin-top:9px">
+              <select onchange="pinProvince(this.value, true); this.selectedIndex=0;">
+                <option value="">Pin an installer to the top…</option>
+                ${rows.filter(r => !r.featured_province)
+                  .map(r => `<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}
+              </select>
+            </div>
+            ${pinned.length ? `<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap">
+              ${pinned.map(p => `<button class="btn btn-sm btn-ghost" onclick="pinProvince('${esc(p.id)}', false)">
+                ${esc(p.name)} ✕</button>`).join('')}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('') : '<div class="empty">No installers yet.</div>');
+  }
+  async function setNational(id){
+    // Only one national spot, so clear the incumbent before setting the new one.
+    await sb.from('installers').update({ featured_national:false }).eq('featured_national', true);
+    if(id){
+      const { error } = await sb.from('installers').update({ featured_national:true }).eq('id', id);
+      if(error) return toast(error.message);
+    }
+    toast(id ? 'National spot set' : 'National spot cleared'); await loadAll();
+  }
+  async function pinProvince(id, on){
+    if(!id) return;
+    const { error } = await sb.from('installers').update({ featured_province: on }).eq('id', id);
+    if(error) return toast(error.message);
+    toast(on ? 'Pinned to the top of its province' : 'Unpinned'); await loadAll();
   }
 
-  // ---------- Ads ----------
-  async function loadAds(){
-    const { data, error } = await sb.from('ads').select('*').order('display_order');
-    if(error){ alert('Ad load error: '+error.message); return; }
-    ADS = data;
-    renderAdsTable();
+  // ------------------------------------------------------------ ads ----
+  async function toggleAds(){
+    const on = checked('adsOn') ? 'true' : 'false';
+    const { error } = await sb.from('settings').upsert({ key:'ads_enabled', value:on });
+    if(error) return toast(error.message);
+    toast(on === 'true' ? 'Advert strip is visible' : 'Advert strip is hidden');
   }
-
-  function renderAdsTable(){
-    document.getElementById('adsTbody').innerHTML = ADS.map(ad => {
-      const inst = ROWS.find(r=>r.id===ad.installer_id);
-      return `<tr>
-        <td>${esc(ad.title)}</td>
-        <td>${esc(ad.discount_text||'—')}</td>
-        <td>${esc(inst?inst.name:'—')}</td>
-        <td><span class="pill ${ad.active?'pill-yes':'pill-no'}">${ad.active?'Active':'Off'}</span></td>
-        <td class="actions">
-          <button class="btn" onclick="openAdEdit('${esc(ad.id)}')">Edit</button>
-          <button class="btn btn-danger" onclick="deleteAd('${esc(ad.id)}')">Delete</button>
-        </td>
-      </tr>`;
-    }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px;">No adverts yet.</td></tr>';
+  function renderAds(){
+    document.getElementById('adsBox').innerHTML = ADS.length ? ADS.map(a => `
+      <div class="row">
+        <div class="row-main">
+          <b>${esc(a.title)} ${a.active ? '<span class="chip chip-ok">Running</span>' : '<span class="chip chip-off">Paused</span>'}</b>
+          <div class="meta">${esc(a.subtitle || '')}${a.discount_text ? ' &nbsp;·&nbsp; ' + esc(a.discount_text) : ''}</div>
+          <div class="meta">Order ${esc(a.display_order)}${a.cta_url ? ' &nbsp;·&nbsp; ' + esc(a.cta_url) : ''}</div>
+        </div>
+        <div class="row-acts">
+          <button class="btn btn-sm btn-ghost" onclick="openAd('${esc(a.id)}')">Edit</button>
+          <button class="btn btn-sm btn-stop" onclick="deleteRow('ads','${esc(a.id)}','Delete this advert?')">Delete</button>
+        </div>
+      </div>`).join('') : '<div class="empty">No adverts yet.</div>';
   }
-
-  function openAdEdit(id){
-    const a = id ? ADS.find(x=>x.id===id) : null;
-    document.getElementById('adModalTitle').textContent = a ? 'Edit Advert' : 'Add Advert';
-    document.getElementById('a_id').value = a ? a.id : '';
-    document.getElementById('a_title').value = a ? a.title : '';
-    document.getElementById('a_subtitle').value = a ? (a.subtitle||'') : '';
-    document.getElementById('a_discount').value = a ? (a.discount_text||'') : '';
-    document.getElementById('a_order').value = a ? a.display_order : 0;
-    document.getElementById('a_installer').value = a ? (a.installer_id||'') : '';
-    document.getElementById('a_cta').value = a ? (a.cta_url||'') : '';
-    document.getElementById('a_image_file').value = '';
-    document.getElementById('a_image_hint').textContent = a && a.image_url ? 'Current image is set — choose a file to replace it.' : '';
-    document.getElementById('a_active').checked = a ? !!a.active : true;
-    document.getElementById('adModalOverlay').classList.add('open');
+  function openAd(id){
+    const a = id ? ADS.find(x => x.id === id) : null;
+    const d = Object.assign({ title:'', subtitle:'', discount_text:'', cta_url:'', installer_id:'', active:true, display_order:0 }, a || {});
+    showModal(id ? 'Edit advert' : 'New advert', `
+      <input type="hidden" id="a_id" value="${esc(id || '')}">
+      <div class="field-row"><label for="a_title">Headline</label><input id="a_title" type="text" value="${esc(d.title)}"></div>
+      <div class="field-row"><label for="a_sub">Supporting line</label><input id="a_sub" type="text" value="${esc(d.subtitle || '')}"></div>
+      <div class="grid2">
+        <div class="field-row"><label for="a_disc">Badge (optional)</label><input id="a_disc" type="text" value="${esc(d.discount_text || '')}" placeholder="10% off"></div>
+        <div class="field-row"><label for="a_order">Order</label><input id="a_order" type="number" value="${esc(d.display_order)}"></div>
+      </div>
+      <div class="field-row"><label for="a_url">Link</label><input id="a_url" type="text" value="${esc(d.cta_url || '')}" placeholder="https://…"></div>
+      <div class="field-row"><label for="a_inst">Linked installer (optional — uses their logo)</label>
+        <select id="a_inst"><option value="">None</option>
+          ${INSTALLERS.map(r => `<option value="${esc(r.id)}"${d.installer_id === r.id ? ' selected' : ''}>${esc(r.name)}</option>`).join('')}
+        </select></div>
+      <label class="check"><input type="checkbox" id="a_active" ${d.active ? 'checked' : ''}> Running</label>
+    `, `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-navy" onclick="saveAd()">${id ? 'Save' : 'Create'}</button>`);
   }
-  function closeAdEdit(){ document.getElementById('adModalOverlay').classList.remove('open'); }
-
   async function saveAd(){
-    const id = document.getElementById('a_id').value;
-    const imageUrl = await uploadFile(document.getElementById('a_image_file'), 'ads');
+    const id = val('a_id');
     const payload = {
-      title: document.getElementById('a_title').value.trim(),
-      subtitle: document.getElementById('a_subtitle').value.trim(),
-      discount_text: document.getElementById('a_discount').value.trim(),
-      display_order: Number(document.getElementById('a_order').value || 0),
-      installer_id: document.getElementById('a_installer').value || null,
-      cta_url: document.getElementById('a_cta').value.trim(),
-      active: document.getElementById('a_active').checked
+      title: val('a_title'), subtitle: val('a_sub') || null,
+      discount_text: val('a_disc') || null, cta_url: val('a_url') || null,
+      installer_id: val('a_inst') || null, active: checked('a_active'),
+      display_order: Number(val('a_order')) || 0
     };
-    if(imageUrl) payload.image_url = imageUrl;
-    if(!payload.title){ alert('Title is required'); return; }
-    let error;
-    if(id){ ({ error } = await sb.from('ads').update(payload).eq('id', id)); }
-    else { ({ error } = await sb.from('ads').insert(payload)); }
-    if(error){ alert('Save error: '+error.message); return; }
-    closeAdEdit();
-    await loadAds();
+    if(!payload.title) return toast('A headline is required');
+    const { error } = id ? await sb.from('ads').update(payload).eq('id', id)
+                         : await sb.from('ads').insert(payload);
+    if(error) return toast(error.message);
+    closeModal(); toast('Advert saved'); await loadAll();
   }
 
-  async function deleteAd(id){
-    if(!confirm('Delete this advert?')) return;
-    const { error } = await sb.from('ads').delete().eq('id', id);
-    if(error){ alert('Delete error: '+error.message); return; }
-    await loadAds();
+  // -------------------------------------------------- announcements ----
+  function renderNews(){
+    document.getElementById('newsBox').innerHTML = NEWS.length ? NEWS.map(n => {
+      const live = isLive(n);
+      return `<div class="row">
+        <div class="row-main">
+          <b>${live ? '<span class="chip chip-ok">Live</span>' : '<span class="chip chip-off">Not showing</span>'}</b>
+          <div style="margin-top:6px">${esc(n.body)}</div>
+          <div class="meta">${esc(when(n.starts_at))}${n.ends_at ? ' → ' + esc(when(n.ends_at)) : ' → no end date'}
+            ${n.link_url ? ' &nbsp;·&nbsp; ' + esc(n.link_label || 'link') : ''}</div>
+        </div>
+        <div class="row-acts">
+          <button class="btn btn-sm btn-ghost" onclick="openNews('${esc(n.id)}')">Edit</button>
+          <button class="btn btn-sm btn-stop" onclick="deleteRow('announcements','${esc(n.id)}','Delete this announcement?')">Delete</button>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty">No announcements yet.</div>';
+  }
+  const forInput = iso => iso ? new Date(iso).toISOString().slice(0,16) : '';
+  function openNews(id){
+    const n = id ? NEWS.find(x => x.id === id) : null;
+    const d = Object.assign({ body:'', link_url:'', link_label:'', tone:'info', active:true, starts_at:new Date().toISOString(), ends_at:null }, n || {});
+    showModal(id ? 'Edit announcement' : 'New announcement', `
+      <input type="hidden" id="n_id" value="${esc(id || '')}">
+      <div class="field-row"><label for="n_body">Message</label><textarea id="n_body" maxlength="240">${esc(d.body)}</textarea>
+        <p class="note">One line reads best. It sits across the top of the public site.</p></div>
+      <div class="grid2">
+        <div class="field-row"><label for="n_url">Link (optional)</label><input id="n_url" type="text" value="${esc(d.link_url || '')}"></div>
+        <div class="field-row"><label for="n_label">Link text</label><input id="n_label" type="text" value="${esc(d.link_label || '')}" placeholder="Read more"></div>
+      </div>
+      <div class="grid2">
+        <div class="field-row"><label for="n_start">Starts</label><input id="n_start" type="datetime-local" value="${esc(forInput(d.starts_at))}"></div>
+        <div class="field-row"><label for="n_end">Ends (optional)</label><input id="n_end" type="datetime-local" value="${esc(forInput(d.ends_at))}"></div>
+      </div>
+      <div class="field-row"><label for="n_tone">Tone</label>
+        <select id="n_tone">
+          <option value="info"${d.tone === 'info' ? ' selected' : ''}>Information</option>
+          <option value="alert"${d.tone === 'alert' ? ' selected' : ''}>Alert</option>
+        </select></div>
+      <label class="check"><input type="checkbox" id="n_active" ${d.active ? 'checked' : ''}> Active</label>
+    `, `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-navy" onclick="saveNews()">${id ? 'Save' : 'Publish'}</button>`);
+  }
+  async function saveNews(){
+    const id = val('n_id');
+    const body = val('n_body');
+    if(!body) return toast('A message is required');
+    const payload = {
+      body, link_url: val('n_url') || null, link_label: val('n_label') || null,
+      tone: val('n_tone'), active: checked('n_active'),
+      starts_at: val('n_start') ? new Date(val('n_start')).toISOString() : new Date().toISOString(),
+      ends_at: val('n_end') ? new Date(val('n_end')).toISOString() : null
+    };
+    const { error } = id ? await sb.from('announcements').update(payload).eq('id', id)
+                         : await sb.from('announcements').insert(payload);
+    if(error) return toast(error.message);
+    closeModal(); toast('Announcement saved'); await loadAll();
   }
 
-  // ---------- Settings ----------
-  async function loadSettings(){
-    const { data } = await sb.from('settings').select('*').eq('key','ads_enabled').maybeSingle();
-    document.getElementById('adsEnabledToggle').checked = !data || data.value === 'true';
+  // -------------------------------------------------------- reviews ----
+  function setRevFilter(f){
+    revFilter = f;
+    document.getElementById('revWith').classList.toggle('on', f === 'comments');
+    document.getElementById('revAll').classList.toggle('on', f === 'all');
+    document.getElementById('revHidden').classList.toggle('on', f === 'hidden');
+    renderReviews();
   }
-  async function toggleAdsEnabled(){
-    const on = document.getElementById('adsEnabledToggle').checked;
-    const { error } = await sb.from('settings').update({ value: String(on) }).eq('key','ads_enabled');
-    if(error) alert('Could not update: '+error.message);
+  function renderReviews(){
+    const nameOf = id => (INSTALLERS.find(i => i.id === id) || {}).name || 'Unknown listing';
+    let list = REVIEWS.slice();
+    if(revFilter === 'comments') list = list.filter(r => r.comment && r.comment.trim());
+    if(revFilter === 'hidden')   list = list.filter(r => r.status === 'hidden');
+    document.getElementById('revBox').innerHTML = list.length ? list.map(r => `
+      <div class="row">
+        <div class="row-main">
+          <b>${esc(nameOf(r.installer_id))}
+            <span class="chip ${r.status === 'hidden' ? 'chip-no' : 'chip-ok'}">${r.status === 'hidden' ? 'Hidden' : 'Visible'}</span></b>
+          <div class="meta">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} &nbsp;·&nbsp; ${esc(when(r.created_at))}</div>
+          ${r.comment ? `<div class="msg">${esc(r.comment)}</div>` : '<div class="meta">Rating only, no comment</div>'}
+          ${r.hidden_reason ? `<div class="meta" style="margin-top:6px">Hidden because: ${esc(r.hidden_reason)}</div>` : ''}
+        </div>
+        <div class="row-acts">
+          ${r.status === 'hidden'
+            ? `<button class="btn btn-sm btn-ghost" onclick="setReviewStatus('${esc(r.id)}','visible')">Show again</button>`
+            : `<button class="btn btn-sm btn-ghost" onclick="setReviewStatus('${esc(r.id)}','hidden')">Hide</button>`}
+          <button class="btn btn-sm btn-stop" onclick="deleteRow('reviews','${esc(r.id)}','Delete this review for good?')">Delete</button>
+        </div>
+      </div>`).join('') : '<div class="empty">Nothing here.</div>';
+  }
+  async function setReviewStatus(id, status){
+    let reason = null;
+    if(status === 'hidden'){
+      reason = prompt('Why is this being hidden? (kept internal, optional)', '');
+      if(reason === null) return;
+    }
+    const { error } = await sb.from('reviews')
+      .update({ status, hidden_reason: status === 'hidden' ? (reason || null) : null }).eq('id', id);
+    if(error) return toast(error.message);
+    toast(status === 'hidden' ? 'Hidden from the listing' : 'Visible again'); await loadAll();
   }
 
-  checkSession();
+  // ----------------------------------------------------------- misc ----
+  async function deleteRow(table, id, confirmText){
+    if(!confirm(confirmText)) return;
+    const { error } = await sb.from(table).delete().eq('id', id);
+    if(error) return toast(error.message);
+    toast('Deleted'); await loadAll();
+  }
+
+  boot();
 </script>
 </body>
 </html>

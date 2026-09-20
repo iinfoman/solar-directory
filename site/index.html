@@ -125,6 +125,24 @@
   .prop b{display:block;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:700;color:var(--navy);line-height:1.25;}
   .prop span{display:block;font-size:12px;color:var(--ink-2);margin-top:2px;}
 
+  /* ---------- announcement ---------- */
+  .news{background:var(--navy);color:#fff;font-size:13.5px;}
+  .news.alert{background:#8A2F1E;}
+  .news-in{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:9px 20px;text-align:center;}
+  .news a{color:var(--sun);font-weight:700;border-bottom:1px solid rgba(245,179,36,.5);}
+
+  /* ---------- adverts ---------- */
+  .ads{background:var(--sun-tint);border-bottom:1px solid #F1E2BE;padding:16px 0;}
+  .ad-head{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--sun-deep);font-weight:700;margin-bottom:10px;}
+  .ad-list{display:grid;gap:10px;grid-template-columns:1fr;}
+  @media(min-width:760px){.ad-list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}}
+  .ad{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid #F0DFB4;border-radius:var(--r-card);padding:13px;}
+  .ad-logo{width:44px;height:44px;border-radius:10px;background:var(--sky);display:grid;place-items:center;overflow:hidden;flex-shrink:0;}
+  .ad-logo img{width:100%;height:100%;object-fit:contain;}
+  .ad b{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--navy);display:block;}
+  .ad p{font-size:12.5px;color:var(--ink-2);margin-top:2px;}
+  .ad .badge{display:inline-block;margin-left:7px;font-size:10.5px;font-weight:800;color:var(--navy);background:var(--sun);padding:2px 7px;border-radius:999px;vertical-align:middle;}
+
   /* ---------- results ---------- */
   .results{background:var(--sky-2);padding:26px 0 52px;}
   .results-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
@@ -188,6 +206,8 @@
 </head>
 <body>
 
+<div class="news" id="newsBar" hidden><div class="news-in" id="newsBody"></div></div>
+
 <header>
   <div class="nav">
     <a class="brand" href="/">
@@ -197,7 +217,7 @@
         <img class="brand-logo" src="assets/logo.png" width="432" height="120" alt="SolarDirectory South Africa">
       </picture>
     </a>
-    <a class="btn btn-sun btn-sm" href="mailto:hello@solardirectorysa.co.za?subject=List%20my%20business">List your business</a>
+    <a class="btn btn-sun btn-sm" href="list.html">List your business</a>
   </div>
 </header>
 
@@ -285,9 +305,8 @@
 
   <section class="ads" id="adsSection" hidden>
     <div class="wrap">
-      <div class="ad-head">Featured offer</div>
-      <div class="ad-carousel" id="adsCarousel"></div>
-      <div class="ad-dots" id="adsDots"></div>
+      <div class="ad-head">Featured offers</div>
+      <div class="ad-list" id="adList"></div>
     </div>
   </section>
 
@@ -521,13 +540,20 @@
           ${[1,2,3,4,5].map(n => `<button class="rate-btn" data-n="${n}" onclick="submitRating('${esc(id)}',${n})"
               onmouseover="litUpTo(${n})" onfocus="litUpTo(${n})" aria-label="Rate ${n} out of 5">★</button>`).join('')}
         </div>
+        <textarea id="rateComment" maxlength="600" rows="3" placeholder="Say what the job was like (optional)"
+          style="width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:13.5px;resize:vertical"></textarea>
         <div class="rate-msg" id="rateMsg"></div>
+        <div id="commentList"></div>
       </div>`;
 
     if(alreadyRated(id)){
       document.getElementById('rateMsg').style.color = 'var(--trust)';
       document.getElementById('rateMsg').textContent = 'You have already rated this installer. Thank you.';
     }
+    loadComments(id).then(html => {
+      const el = document.getElementById('commentList');
+      if(el && html) el.innerHTML = html;
+    });
     document.getElementById('modalOverlay').classList.add('open');
   }
   function closeModal(){
@@ -551,7 +577,10 @@
     }
     msg.style.color = 'var(--ink-2)';
     msg.textContent = 'Saving…';
-    const { error } = await sb.from('reviews').insert({ installer_id: id, rating: n, voter_key: voterKey() });
+    const box = document.getElementById('rateComment');
+    const comment = box && box.value.trim() ? box.value.trim().slice(0, 600) : null;
+    const { error } = await sb.from('reviews')
+      .insert({ installer_id: id, rating: n, voter_key: voterKey(), comment, status: 'visible' });
     if(error){
       // 23505 = unique violation: this browser key already rated this installer.
       const dupe = error.code === '23505' || /duplicate key/i.test(error.message || '');
@@ -565,6 +594,52 @@
     msg.textContent = `Thank you — you rated ${n} out of 5.`;
     await loadRatings();
     applyFilters();
+  }
+
+  async function loadNews(){
+    const { data, error } = await sb.from('announcements')
+      .select('*').order('created_at', { ascending:false }).limit(1);
+    if(error || !data || !data.length) return;
+    const n = data[0];
+    const link = safeUrl(n.link_url);
+    document.getElementById('newsBody').innerHTML =
+      `<span>${esc(n.body)}</span>` +
+      (link ? ` <a href="${link}" rel="noopener">${esc(n.link_label || 'Read more')}</a>` : '');
+    const bar = document.getElementById('newsBar');
+    bar.classList.toggle('alert', n.tone === 'alert');
+    bar.hidden = false;
+  }
+
+  async function loadAds(){
+    const [setting, ads] = await Promise.all([
+      sb.from('settings').select('*').eq('key','ads_enabled').maybeSingle(),
+      sb.from('ads').select('*').eq('active', true).order('display_order')
+    ]);
+    const on = !setting.error && setting.data && setting.data.value === 'true';
+    if(!on || ads.error || !ads.data || !ads.data.length) return;
+    const byId = {}; ALL.forEach(r => byId[r.id] = r);
+    document.getElementById('adList').innerHTML = ads.data.map(ad => {
+      const inst = ad.installer_id ? byId[ad.installer_id] : null;
+      const logo = safeUrl(ad.image_url) || (inst ? safeUrl(inst.logo_url) : '');
+      const link = safeUrl(ad.cta_url) || (inst ? siteUrl(inst.website) : '');
+      const inner = `<span class="ad-logo">${logo ? `<img src="${logo}" alt="" loading="lazy">` : '★'}</span>
+        <span><b>${esc(ad.title)}${ad.discount_text ? `<span class="badge">${esc(ad.discount_text)}</span>` : ''}</b>
+        <p>${esc(ad.subtitle || '')}</p></span>`;
+      return link
+        ? `<a class="ad" href="${link}" target="_blank" rel="noopener nofollow">${inner}</a>`
+        : `<div class="ad">${inner}</div>`;
+    }).join('');
+    document.getElementById('adsSection').hidden = false;
+  }
+
+  async function loadComments(id){
+    const { data, error } = await sb.from('installer_comments')
+      .select('*').eq('installer_id', id).order('created_at', { ascending:false }).limit(12);
+    if(error || !data || !data.length) return '';
+    return data.map(c => `<div style="border-top:1px solid var(--line);padding-top:11px;margin-top:11px">
+      <div style="font-size:12.5px;color:var(--star)">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+      <p style="font-size:13.5px;color:var(--ink);margin-top:4px">${esc(c.comment)}</p>
+    </div>`).join('');
   }
 
   async function loadRatings(){
@@ -597,6 +672,8 @@
     setStats();
     await loadRatings();
     applyFilters();
+    loadNews();
+    loadAds();
   }
 
   ['q','province','sort'].forEach(id => {
