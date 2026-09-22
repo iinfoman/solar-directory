@@ -385,6 +385,8 @@
 
     const todo = [];
     if(pending) todo.push([`${pending} listing request${pending===1?'':'s'} waiting`, 'requests', 'Review']);
+    const unanswered = REQS.filter(r => !r.replied_at).length;
+    if(unanswered) todo.push([`${unanswered} request${unanswered===1?'':'s'} not replied to yet`, 'requests', 'Reply']);
     if(noContact) todo.push([`${noContact} listing${noContact===1?'':'s'} hidden for having no contact details`, 'installers', 'Fill in']);
     if(newComments) todo.push([`${newComments} review comment${newComments===1?'':'s'} published`, 'reviews', 'Check']);
     if(!liveNews) todo.push(['No announcement running', 'news', 'Write one']);
@@ -425,9 +427,11 @@
           <div class="meta">${contact || 'No contact details supplied'}</div>
           ${r.contact_name ? `<div class="meta">Contact: ${esc(r.contact_name)}</div>` : ''}
           ${r.message ? `<div class="msg">${esc(r.message)}</div>` : ''}
+          ${r.replied_at ? `<div class="meta" style="margin-top:6px;color:var(--trust)">✓ Replied ${esc(when(r.replied_at))}</div>` : ''}
           ${r.admin_note ? `<div class="meta" style="margin-top:6px">Note: ${esc(r.admin_note)}</div>` : ''}
         </div>
         <div class="row-acts">
+          <button class="btn btn-sm btn-navy" onclick="replyTo('${esc(r.id)}')">✉ Reply</button>
           ${r.status === 'pending' ? `
             <button class="btn btn-sm btn-sun" onclick="approveRequest('${esc(r.id)}')">Approve</button>
             <button class="btn btn-sm btn-ghost" onclick="rejectRequest('${esc(r.id)}')">Reject</button>` : ''}
@@ -457,6 +461,56 @@
       .eq('id', id);
     if(error) return toast(error.message);
     toast('Request rejected'); await loadAll();
+  }
+
+  const REPLY_TEXT = {
+    new: (r) => `Hi ${r.contact_name || r.company_name},
+
+Thank you for asking us to list ${r.company_name} on SolarDirectory South Africa.
+
+I have your details and I am checking them against the PV GreenCard register now. I will come back to you once the listing is up — it is usually a day or two.
+
+Listing is free, and there is nothing further you need to do.
+
+Kind regards`,
+
+    claim: (r) => `Hi ${r.contact_name || r.company_name},
+
+Thank you for getting in touch about the ${r.company_name} listing on SolarDirectory South Africa.
+
+I am updating it with the details you sent. If anything else on the listing is wrong, reply to this email and I will fix that too.
+
+Kind regards`,
+
+    correction: (r) => `Hi ${r.contact_name || r.company_name},
+
+Thank you for pointing that out — I am correcting the ${r.company_name} listing on SolarDirectory South Africa now.
+
+If you spot anything else that is wrong, just reply to this email.
+
+Kind regards`
+  };
+
+  // mailto: hands the draft to the device's own mail app, so the reply is
+  // sent by you from your own address. Nothing is sent from the browser.
+  function replyTo(id){
+    const r = REQS.find(x => x.id === id);
+    if(!r) return;
+    const subject = r.kind === 'new'
+      ? `Your listing on SolarDirectory South Africa`
+      : `${r.company_name} — SolarDirectory South Africa`;
+    const body = (REPLY_TEXT[r.kind] || REPLY_TEXT.new)(r);
+    const href = `mailto:${encodeURIComponent(r.email)}`
+      + `?subject=${encodeURIComponent(subject)}`
+      + `&body=${encodeURIComponent(body)}`;
+    // A real anchor rather than location.href: iOS Safari and the in-app
+    // browsers ignore a scripted mailto navigation, but honour a clicked link.
+    const a = document.createElement('a');
+    a.href = href; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    // Mark it so the queue shows who has been answered.
+    sb.from('listing_requests').update({ replied_at: new Date().toISOString() }).eq('id', id)
+      .then(({ error }) => { if(!error) loadAll(); });
   }
 
   // ------------------------------------------------------ installers ----
