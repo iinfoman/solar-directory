@@ -187,7 +187,7 @@
 
     try{
       if(!sb) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { error } = await sb.from('listing_requests').insert({
+      const { data, error } = await sb.from('listing_requests').insert({
         kind: document.querySelector('input[name=kind]:checked').value,
         company_name: v('company'),
         contact_name: v('contact') || null,
@@ -197,8 +197,19 @@
         province: v('province') || null,
         city: v('city') || null,
         message: v('message') || null
-      });
+      }).select('id').single();
       if(error) throw error;
+
+      // Ask the backend to send the confirmation. The request is already
+      // saved by this point, so a failure here is not the visitor's problem
+      // and must not turn their successful submission into an error.
+      if(data && data.id){
+        fetch(SUPABASE_URL + '/functions/v1/notify-listing-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY },
+          body: JSON.stringify({ id: data.id })
+        }).catch(err => console.warn('confirmation email not sent', err));
+      }
       document.getElementById('formWrap').hidden = true;
       document.getElementById('done').hidden = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
