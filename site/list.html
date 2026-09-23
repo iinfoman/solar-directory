@@ -215,7 +215,9 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }catch(ex){
       console.error(ex);
-      err.textContent = 'That did not send. Please try again, or email hello@solardirectorysa.co.za.';
+      // No address here on purpose: hello@solardirectorysa.co.za does not exist
+      // yet, and an address that bounces is worse than none.
+      err.textContent = 'That did not send. Please check your connection and try again.';
       err.hidden = false;
       btn.disabled = false;
       btn.textContent = 'Send request';

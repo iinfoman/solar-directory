@@ -1,16 +1,20 @@
 # Netlify build settings for SolarDirectory.
 #
 # The deployable site is the static bundle in site/ — plain HTML, served as-is.
-# The Vite/React app at the repo root is NOT what gets published, so the build
-# command is pinned empty: without it Netlify auto-detects Vite from
-# package.json, runs npm run build, and publishes dist/ instead.
+# The Vite/React app at the repo root is NOT what gets published, so both the
+# command and the publish directory are pinned: left to itself Netlify detects
+# Vite from package.json, runs npm run build, and publishes dist/ instead.
 #
 # If the React app ever becomes the deployed site, set:
 #   command = "npm run build"
 #   publish = "dist"
 
 [build]
-  command = ""
+  # Regenerates site/installer/<slug>/index.html from the live database on every
+  # deploy, so the pages track the directory. The generated pages are also
+  # committed: if Supabase is unreachable (it pauses itself on the free tier)
+  # the script leaves them alone rather than failing the deploy.
+  command = "node tools/build-installers.mjs"
   publish = "site"
 
 [[headers]]
