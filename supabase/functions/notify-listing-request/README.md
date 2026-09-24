@@ -17,8 +17,18 @@ and the form still works — the request is saved either way.
 | Secret | Example | What it is |
 |---|---|---|
 | `RESEND_API_KEY` | `re_xxx` | From resend.com, after the domain is verified |
-| `MAIL_FROM` | `SolarDirectory South Africa <hello@solardirectorysa.co.za>` | Must be on the verified domain |
+| `MAIL_FROM` | `SolarDirectory South Africa <admin@solardirectorysa.co.za>` | Must be on the verified domain |
 | `ALERT_EMAIL` | your own address | Where new requests are announced |
+
+This is separate from reading mail at `admin@solardirectorysa.co.za` (Zoho Mail, or
+whatever inbox is set up) — Resend only sends *on behalf of* that address, it
+doesn't need to be able to receive. If both are ever configured on this
+domain, the domain's SPF record needs both providers in one `include:`
+chain, since a domain can only have one `v=spf1` record.
+
+Not set up yet. Until it is, the dashboard's Reply button is how requests
+get answered — it hands the draft to whatever mail app is already signed in
+on the device, no secrets required.
 
 ## Why verify_jwt is off
 
