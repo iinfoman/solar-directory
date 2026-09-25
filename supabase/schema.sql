@@ -18,6 +18,10 @@
 create table if not exists installers (
   id                 uuid primary key default gen_random_uuid(),
   name               text not null,
+  -- URL key for the installer's own page at /installer/<slug>/. Held here, not
+  -- derived at render time, so the generated URL cannot drift from what the
+  -- directory links to.
+  slug               text unique,
   city               text not null,
   province           text not null check (province in (
                        'Western Cape','Gauteng','KwaZulu-Natal','Eastern Cape',
